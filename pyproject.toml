@@ -17,7 +17,9 @@ dependencies = [
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "Framework :: AsyncIO",
     "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.11",
@@ -28,6 +30,10 @@ classifiers = [
 ]
 
 [project.urls]
+Homepage = "https://github.com/NicolasKingreen/portals-python"
+Source = "https://github.com/NicolasKingreen/portals-python"
+Issues = "https://github.com/NicolasKingreen/portals-python/issues"
+Changelog = "https://github.com/NicolasKingreen/portals-python/blob/main/CHANGELOG.md"
 "API documentation" = "https://docs.portals.tg/developers/api/"
 
 [dependency-groups]

@@ -1,12 +1,12 @@
 # Portals API Python client
 
-A typed synchronous and asynchronous Python client for the [Portals Partners API](https://docs.portals.tg/developers/api/).
+A typed synchronous and asynchronous Python client for the [Portals Partners API](https://docs.portals.tg/developers/api/), the partner-facing programmatic API of the Portals marketplace.
 
 ## Features
 
 - All 35 operations from the Portals Partners OpenAPI contract
 - Matching `PortalsClient` and `AsyncPortalsClient` APIs
-- Typed Pydantic v2 models for all 87 schemas
+- Typed Pydantic v2 models for every schema in the contract (strict requests, forward-compatible responses)
 - httpx2 connection pooling and injectable HTTP clients
 - Exact `Decimal` amounts and parsed `datetime` timestamps
 - Typed API errors and rate-limit metadata
@@ -14,16 +14,20 @@ A typed synchronous and asynchronous Python client for the [Portals Partners API
 
 ## Installation
 
-From a project checkout:
+```bash
+pip install portals-api
+```
+
+Or with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv add portals-api
+```
+
+From a local checkout:
 
 ```bash
 pip install .
-```
-
-After a PyPI release:
-
-```bash
-pip install portals-api
 ```
 
 The distribution is named `portals-api`; the import package is `portals`.
@@ -115,7 +119,8 @@ with PortalsClient("your-api-key") as client:
     try:
         client.market.actions()
     except RateLimitError as exc:
-        print(exc.rate_limit.reset_seconds)
+        if exc.rate_limit is not None:
+            print(exc.rate_limit.reset_seconds)
     except APIError as exc:
         print(exc.status_code, exc.code, exc.message)
 ```
