@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Any
 
 from ._models import RateLimit
@@ -22,11 +23,23 @@ class InvalidResponseError(PortalsError):
 
 
 class ResponseValidationError(InvalidResponseError):
-    """Raised when a JSON response payload fails Pydantic model validation."""
+    """Raised when a JSON response payload fails Pydantic model validation.
 
-    def __init__(self, message: str, *, response: Any = None) -> None:
+    Attributes:
+        response: The decoded JSON payload that failed validation.
+        errors: Pydantic error details (location, message, and input type).
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        response: Any = None,
+        errors: Sequence[Any] | None = None,
+    ) -> None:
         super().__init__(message)
         self.response = response
+        self.errors = list(errors) if errors is not None else []
 
 
 class APIError(PortalsError):

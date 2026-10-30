@@ -28,7 +28,24 @@ class PortalsClient:
         timeout: Request timeout in seconds or an `httpx2.Timeout` instance.
         client: Optional pre-configured `httpx2.Client`. When provided, the
             caller retains ownership and is responsible for closing it.
+
+    Attributes:
+        arena: Arena rooms, inventory, and bets.
+        offers: Collection offers.
+        collections: Collection previews, metrics, and floor prices.
+        market: Marketplace configuration and activity.
+        nfts: NFT search, ownership, trading, and withdrawals.
+        users: User existence and activity history.
+        wallet: TON wallet balance, deposits, and withdrawals.
     """
+
+    arena: Arena
+    offers: CollectionOffers
+    collections: Collections
+    market: Market
+    nfts: NFTs
+    users: Users
+    wallet: WalletResource
 
     def __init__(
         self,
@@ -117,7 +134,24 @@ class AsyncPortalsClient:
         timeout: Request timeout in seconds or an `httpx2.Timeout` instance.
         client: Optional pre-configured `httpx2.AsyncClient`. When provided, the
             caller retains ownership and is responsible for closing it.
+
+    Attributes:
+        arena: Arena rooms, inventory, and bets.
+        offers: Collection offers.
+        collections: Collection previews, metrics, and floor prices.
+        market: Marketplace configuration and activity.
+        nfts: NFT search, ownership, trading, and withdrawals.
+        users: User existence and activity history.
+        wallet: TON wallet balance, deposits, and withdrawals.
     """
+
+    arena: AsyncArena
+    offers: AsyncCollectionOffers
+    collections: AsyncCollections
+    market: AsyncMarket
+    nfts: AsyncNFTs
+    users: AsyncUsers
+    wallet: AsyncWalletResource
 
     def __init__(
         self,

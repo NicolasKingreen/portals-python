@@ -35,6 +35,18 @@ def _adapter(model: Any) -> TypeAdapter[Any]:
 _T = TypeVar("_T")
 
 
+def _describe_validation_error(exc: ValidationError, *, limit: int = 5) -> str:
+    """Render the first few Pydantic errors as a single readable line."""
+    errors = exc.errors()
+    parts = []
+    for error in errors[:limit]:
+        location = ".".join(str(item) for item in error.get("loc", ())) or "<root>"
+        parts.append(f"{location}: {error.get('msg', 'invalid value')}")
+    if len(errors) > limit:
+        parts.append(f"... and {len(errors) - limit} more")
+    return "; ".join(parts)
+
+
 def dump_model(model: BaseModel) -> dict[str, Any]:
     return model.model_dump(mode="json", by_alias=True, exclude_none=True)
 
@@ -105,8 +117,9 @@ class BaseTransport:
         except ValidationError as exc:
             raise ResponseValidationError(
                 f"The response from {response.request.method} {response.request.url.path} "
-                "does not match the expected model",
+                f"does not match the expected model: {_describe_validation_error(exc)}",
                 response=data,
+                errors=exc.errors(),
             ) from exc
 
     def _raise_api_error(self, response: httpx2.Response) -> None:

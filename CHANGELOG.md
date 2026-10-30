@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Class-level annotations for `PortalsClient` and `AsyncPortalsClient` resources, so `help()`,
+  `dir()`, and IDE completion list `arena`, `offers`, `collections`, `market`, `nfts`, `users`,
+  and `wallet`.
+- `ResponseValidationError.errors` exposing Pydantic field-level details.
+
+### Changed
+
+- `ResponseValidationError` messages now name the failing fields instead of only reporting that
+  the payload did not match the expected model.
+
 ## [0.1.0] - 2026-10-31
 
 API contract: 1.0.0

@@ -122,6 +122,8 @@ def test_invalid_json_and_validation_error() -> None:
         with pytest.raises(ResponseValidationError) as exc_info:
             client.request("GET", "/partners/bad-model", response_model=MarketConfig)
         assert exc_info.value.response == {"unexpected": "shape"}
+        assert "commission" in str(exc_info.value)
+        assert exc_info.value.errors
 
 
 async def test_owned_vs_injected_async_client_lifecycle() -> None:
