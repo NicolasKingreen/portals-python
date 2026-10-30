@@ -14,3 +14,4 @@ htmlcov/
 .DS_Store
 *:Zone.Identifier
 *.log
+docs/
