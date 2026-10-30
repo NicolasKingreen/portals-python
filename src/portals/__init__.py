@@ -1,3 +1,5 @@
+"""Typed synchronous and asynchronous Python client for the Portals Partners API."""
+
 from . import models as _models
 from ._contract import __api_version__
 from ._models import Amount, RateLimit

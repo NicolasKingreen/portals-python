@@ -23,6 +23,8 @@ from ._helpers import batch
 
 
 class CollectionOffers:
+    """Synchronous collection offers resource (`/partners/collection-offers/*`)."""
+
     def __init__(self, transport: SyncTransport) -> None:
         self._transport = transport
 
@@ -35,6 +37,7 @@ class CollectionOffers:
         attributes: Sequence[OfferAttribute] | None = None,
         expiration_days: Literal[1, 7] | None = None,
     ) -> CollectionOffer:
+        """Create a collection or trait offer."""
         request = CreateOfferRequest(
             collection_id=collection_id,
             amount=_amount(amount),
@@ -50,6 +53,7 @@ class CollectionOffers:
         )
 
     def bulk_update(self, offers: Sequence[BulkUpdateOfferItem]) -> BulkUpdateOffersResponse:
+        """Update up to 50 collection offers in a single request."""
         items = list(batch(offers, "offers"))
         if len({item.id for item in items}) != len(items):
             raise ValueError("offers must not contain duplicate IDs")
@@ -62,10 +66,12 @@ class CollectionOffers:
         )
 
     def cancel(self, offer_id: str) -> None:
+        """Cancel an active collection offer by ID."""
         request = CancelOfferRequest(id=offer_id)
         self._transport.request("POST", "/partners/collection-offers/cancel", json_data=request)
 
     def collections(self) -> OfferCollectionsResponse:
+        """List collections that currently have active offers from the authenticated user."""
         return self._transport.request(
             "GET",
             "/partners/collection-offers/collections",
@@ -79,6 +85,7 @@ class CollectionOffers:
         limit: int | None = 10,
         scope: Literal["broad", "trait"] | None = None,
     ) -> list[CollectionOffersResponse]:
+        """List offers for a collection (1 <= limit <= 10)."""
         if limit is not None and not 1 <= limit <= 10:
             raise ValueError("limit must be between 1 and 10")
         path = f"/partners/collection-offers/{quote(collection_id, safe='')}/all"
@@ -92,12 +99,14 @@ class CollectionOffers:
     def top(
         self, collection_id: str, *, scope: Literal["broad", "trait"] | None = None
     ) -> CollectionOffer:
+        """Fetch the highest active offer for a collection."""
         path = f"/partners/collection-offers/{quote(collection_id, safe='')}/top"
         return self._transport.request(
             "GET", path, params={"scope": scope}, response_model=CollectionOffer
         )
 
     def accept(self, offer_id: str, *, amount: Amount | str, nft_ids: Sequence[str]) -> None:
+        """Accept a collection offer by selling 1 to 50 distinct owned NFTs into it."""
         ids = list(batch(nft_ids, "nft_ids"))
         if len(set(ids)) != len(ids):
             raise ValueError("nft_ids must not contain duplicates")
@@ -107,6 +116,8 @@ class CollectionOffers:
 
 
 class AsyncCollectionOffers:
+    """Asynchronous collection offers resource (`/partners/collection-offers/*`)."""
+
     def __init__(self, transport: AsyncTransport) -> None:
         self._transport = transport
 
@@ -119,6 +130,7 @@ class AsyncCollectionOffers:
         attributes: Sequence[OfferAttribute] | None = None,
         expiration_days: Literal[1, 7] | None = None,
     ) -> CollectionOffer:
+        """Create a collection or trait offer."""
         request = CreateOfferRequest(
             collection_id=collection_id,
             amount=_amount(amount),
@@ -134,6 +146,7 @@ class AsyncCollectionOffers:
         )
 
     async def bulk_update(self, offers: Sequence[BulkUpdateOfferItem]) -> BulkUpdateOffersResponse:
+        """Update up to 50 collection offers in a single request."""
         items = list(batch(offers, "offers"))
         if len({item.id for item in items}) != len(items):
             raise ValueError("offers must not contain duplicate IDs")
@@ -146,12 +159,14 @@ class AsyncCollectionOffers:
         )
 
     async def cancel(self, offer_id: str) -> None:
+        """Cancel an active collection offer by ID."""
         request = CancelOfferRequest(id=offer_id)
         await self._transport.request(
             "POST", "/partners/collection-offers/cancel", json_data=request
         )
 
     async def collections(self) -> OfferCollectionsResponse:
+        """List collections that currently have active offers from the authenticated user."""
         return await self._transport.request(
             "GET",
             "/partners/collection-offers/collections",
@@ -165,6 +180,7 @@ class AsyncCollectionOffers:
         limit: int | None = 10,
         scope: Literal["broad", "trait"] | None = None,
     ) -> list[CollectionOffersResponse]:
+        """List offers for a collection (1 <= limit <= 10)."""
         if limit is not None and not 1 <= limit <= 10:
             raise ValueError("limit must be between 1 and 10")
         path = f"/partners/collection-offers/{quote(collection_id, safe='')}/all"
@@ -178,12 +194,14 @@ class AsyncCollectionOffers:
     async def top(
         self, collection_id: str, *, scope: Literal["broad", "trait"] | None = None
     ) -> CollectionOffer:
+        """Fetch the highest active offer for a collection."""
         path = f"/partners/collection-offers/{quote(collection_id, safe='')}/top"
         return await self._transport.request(
             "GET", path, params={"scope": scope}, response_model=CollectionOffer
         )
 
     async def accept(self, offer_id: str, *, amount: Amount | str, nft_ids: Sequence[str]) -> None:
+        """Accept a collection offer by selling 1 to 50 distinct owned NFTs into it."""
         ids = list(batch(nft_ids, "nft_ids"))
         if len(set(ids)) != len(ids):
             raise ValueError("nft_ids must not contain duplicates")

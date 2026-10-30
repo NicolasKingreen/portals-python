@@ -29,6 +29,8 @@ from ._helpers import batch, nft_query
 
 
 class NFTs:
+    """Synchronous NFTs resource (`/partners/nfts/*`)."""
+
     def __init__(self, transport: SyncTransport) -> None:
         self._transport = transport
 
@@ -55,6 +57,7 @@ class NFTs:
         statuses: Sequence[str] | None = None,
         tg_ids: Sequence[str] | None = None,
     ) -> SearchNFTsResponse:
+        """Search marketplace NFTs by collection, attributes, price range, or status."""
         params = nft_query(
             collection_id=collection_id,
             collection_ids=collection_ids,
@@ -103,6 +106,7 @@ class NFTs:
         tg_ids: Sequence[str] | None = None,
         with_attributes: bool | None = None,
     ) -> OwnedNFTsResponse:
+        """List NFTs owned by the authenticated user."""
         params = nft_query(
             collection_id=collection_id,
             collection_ids=collection_ids,
@@ -129,6 +133,7 @@ class NFTs:
         )
 
     def buy(self, nft_details: Sequence[BuyDetail]) -> BuyResponse:
+        """Purchase 1 to 50 NFTs. Inspect `purchase_results` for per-NFT outcomes."""
         details = list(batch(nft_details, "nft_details"))
         request = BuyRequest(nft_details=details)
         return self._transport.request(
@@ -136,6 +141,7 @@ class NFTs:
         )
 
     def bulk_list(self, nft_prices: Sequence[NFTPriceDetail]) -> BulkListingResult:
+        """List multiple owned NFTs for sale."""
         prices = _nonempty(nft_prices, "nft_prices")
         request = BulkListRequest(nft_prices=prices)
         return self._transport.request(
@@ -146,6 +152,7 @@ class NFTs:
         )
 
     def bulk_unlist(self, nft_ids: Sequence[str]) -> BulkListingResult:
+        """Remove multiple owned NFTs from sale."""
         request = BulkDelistRequest(nft_ids=_nonempty(nft_ids, "nft_ids"))
         return self._transport.request(
             "POST",
@@ -155,6 +162,7 @@ class NFTs:
         )
 
     def stats(self) -> NFTStats:
+        """Fetch counts of listed and unlisted NFTs owned by the authenticated user."""
         return self._transport.request("GET", "/partners/nfts/stats", response_model=NFTStats)
 
     def transfer(
@@ -165,6 +173,7 @@ class NFTs:
         recipient_token: str | None = None,
         anonymous: bool | None = None,
     ) -> TransferGiftsResponse:
+        """Transfer owned NFTs to a recipient username/ID or recipient token."""
         if (recipient is None) == (recipient_token is None):
             raise ValueError("Provide exactly one of recipient or recipient_token")
         request = TransferGiftsRequest(
@@ -187,6 +196,7 @@ class NFTs:
         recipient_id: int | None = None,
         unsafe_transfer: bool | None = None,
     ) -> WithdrawGiftsResponse:
+        """Withdraw owned gifts from Portals to Telegram."""
         request = WithdrawGiftsRequest(
             gift_ids=_nonempty(gift_ids, "gift_ids"),
             recipient_id=recipient_id,
@@ -200,6 +210,7 @@ class NFTs:
         )
 
     def withdrawal_statuses(self, ids: Sequence[int]) -> WithdrawalStatusesResponse:
+        """Fetch the status of one or more gift withdrawals by ID."""
         if not ids:
             raise ValueError("ids must not be empty")
         return self._transport.request(
@@ -210,16 +221,20 @@ class NFTs:
         )
 
     def list(self, nft_id: str, *, price: Amount | str) -> None:
+        """List a single owned NFT for sale at the specified price."""
         path = f"/partners/nfts/{quote(nft_id, safe='')}/list"
         request = ListNFTRequest(price=_amount(price))
         self._transport.request("POST", path, json_data=request)
 
     def unlist(self, nft_id: str) -> None:
+        """Remove a single owned NFT from sale."""
         path = f"/partners/nfts/{quote(nft_id, safe='')}/unlist"
         self._transport.request("POST", path)
 
 
 class AsyncNFTs:
+    """Asynchronous NFTs resource (`/partners/nfts/*`)."""
+
     def __init__(self, transport: AsyncTransport) -> None:
         self._transport = transport
 
@@ -246,6 +261,7 @@ class AsyncNFTs:
         statuses: Sequence[str] | None = None,
         tg_ids: Sequence[str] | None = None,
     ) -> SearchNFTsResponse:
+        """Search marketplace NFTs by collection, attributes, price range, or status."""
         params = nft_query(
             collection_id=collection_id,
             collection_ids=collection_ids,
@@ -294,6 +310,7 @@ class AsyncNFTs:
         tg_ids: Sequence[str] | None = None,
         with_attributes: bool | None = None,
     ) -> OwnedNFTsResponse:
+        """List NFTs owned by the authenticated user."""
         params = nft_query(
             collection_id=collection_id,
             collection_ids=collection_ids,
@@ -320,6 +337,7 @@ class AsyncNFTs:
         )
 
     async def buy(self, nft_details: Sequence[BuyDetail]) -> BuyResponse:
+        """Purchase 1 to 50 NFTs. Inspect `purchase_results` for per-NFT outcomes."""
         details = list(batch(nft_details, "nft_details"))
         request = BuyRequest(nft_details=details)
         return await self._transport.request(
@@ -327,6 +345,7 @@ class AsyncNFTs:
         )
 
     async def bulk_list(self, nft_prices: Sequence[NFTPriceDetail]) -> BulkListingResult:
+        """List multiple owned NFTs for sale."""
         prices = _nonempty(nft_prices, "nft_prices")
         request = BulkListRequest(nft_prices=prices)
         return await self._transport.request(
@@ -337,6 +356,7 @@ class AsyncNFTs:
         )
 
     async def bulk_unlist(self, nft_ids: Sequence[str]) -> BulkListingResult:
+        """Remove multiple owned NFTs from sale."""
         request = BulkDelistRequest(nft_ids=_nonempty(nft_ids, "nft_ids"))
         return await self._transport.request(
             "POST",
@@ -346,6 +366,7 @@ class AsyncNFTs:
         )
 
     async def stats(self) -> NFTStats:
+        """Fetch counts of listed and unlisted NFTs owned by the authenticated user."""
         return await self._transport.request("GET", "/partners/nfts/stats", response_model=NFTStats)
 
     async def transfer(
@@ -356,6 +377,7 @@ class AsyncNFTs:
         recipient_token: str | None = None,
         anonymous: bool | None = None,
     ) -> TransferGiftsResponse:
+        """Transfer owned NFTs to a recipient username/ID or recipient token."""
         if (recipient is None) == (recipient_token is None):
             raise ValueError("Provide exactly one of recipient or recipient_token")
         request = TransferGiftsRequest(
@@ -378,6 +400,7 @@ class AsyncNFTs:
         recipient_id: int | None = None,
         unsafe_transfer: bool | None = None,
     ) -> WithdrawGiftsResponse:
+        """Withdraw owned gifts from Portals to Telegram."""
         request = WithdrawGiftsRequest(
             gift_ids=_nonempty(gift_ids, "gift_ids"),
             recipient_id=recipient_id,
@@ -391,6 +414,7 @@ class AsyncNFTs:
         )
 
     async def withdrawal_statuses(self, ids: Sequence[int]) -> WithdrawalStatusesResponse:
+        """Fetch the status of one or more gift withdrawals by ID."""
         if not ids:
             raise ValueError("ids must not be empty")
         return await self._transport.request(
@@ -401,11 +425,13 @@ class AsyncNFTs:
         )
 
     async def list(self, nft_id: str, *, price: Amount | str) -> None:
+        """List a single owned NFT for sale at the specified price."""
         path = f"/partners/nfts/{quote(nft_id, safe='')}/list"
         request = ListNFTRequest(price=_amount(price))
         await self._transport.request("POST", path, json_data=request)
 
     async def unlist(self, nft_id: str) -> None:
+        """Remove a single owned NFT from sale."""
         path = f"/partners/nfts/{quote(nft_id, safe='')}/unlist"
         await self._transport.request("POST", path)
 

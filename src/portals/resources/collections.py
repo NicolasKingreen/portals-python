@@ -16,10 +16,13 @@ from ..models import (
 
 
 class Collections:
+    """Synchronous collections resource (`/partners/collections/*`)."""
+
     def __init__(self, transport: SyncTransport) -> None:
         self._transport = transport
 
     def attribute_floors(self) -> AttributeFloorsResponse:
+        """Fetch floor prices across all unique collection attributes."""
         return self._transport.request(
             "GET",
             "/partners/collections/attribute-floors",
@@ -27,16 +30,19 @@ class Collections:
         )
 
     def backdrop_floors(self) -> FloorPricesResponse:
+        """Fetch floor prices grouped by backdrop."""
         return self._transport.request(
             "GET", "/partners/collections/backdrops/floors", response_model=FloorPricesResponse
         )
 
     def floors(self) -> FloorPricesResponse:
+        """Fetch floor prices for all collections."""
         return self._transport.request(
             "GET", "/partners/collections/floors", response_model=FloorPricesResponse
         )
 
     def model_background_floors(self, models: Sequence[str]) -> ModelBackgroundFloorsResponse:
+        """Fetch backdrop floor prices for specific model names."""
         if not models:
             raise ValueError("models must not be empty")
         return self._transport.request(
@@ -52,6 +58,7 @@ class Collections:
         sort_by: Literal["name", "floor_price"] | None = None,
         sort_order: Literal["asc", "desc"] | None = None,
     ) -> CollectionsPreviewResponse:
+        """List collections with preview metadata and floor prices."""
         return self._transport.request(
             "GET",
             "/partners/collections/preview",
@@ -67,6 +74,7 @@ class Collections:
         from_: datetime | str | None = None,
         to: datetime | str | None = None,
     ) -> CollectionMetricsResponse:
+        """Fetch historical volume and price metrics for a collection."""
         return self._transport.request(
             "GET",
             f"/partners/collections/{quote(collection_id, safe='')}/metrics",
@@ -76,10 +84,13 @@ class Collections:
 
 
 class AsyncCollections:
+    """Asynchronous collections resource (`/partners/collections/*`)."""
+
     def __init__(self, transport: AsyncTransport) -> None:
         self._transport = transport
 
     async def attribute_floors(self) -> AttributeFloorsResponse:
+        """Fetch floor prices across all unique collection attributes."""
         return await self._transport.request(
             "GET",
             "/partners/collections/attribute-floors",
@@ -87,16 +98,19 @@ class AsyncCollections:
         )
 
     async def backdrop_floors(self) -> FloorPricesResponse:
+        """Fetch floor prices grouped by backdrop."""
         return await self._transport.request(
             "GET", "/partners/collections/backdrops/floors", response_model=FloorPricesResponse
         )
 
     async def floors(self) -> FloorPricesResponse:
+        """Fetch floor prices for all collections."""
         return await self._transport.request(
             "GET", "/partners/collections/floors", response_model=FloorPricesResponse
         )
 
     async def model_background_floors(self, models: Sequence[str]) -> ModelBackgroundFloorsResponse:
+        """Fetch backdrop floor prices for specific model names."""
         if not models:
             raise ValueError("models must not be empty")
         return await self._transport.request(
@@ -112,6 +126,7 @@ class AsyncCollections:
         sort_by: Literal["name", "floor_price"] | None = None,
         sort_order: Literal["asc", "desc"] | None = None,
     ) -> CollectionsPreviewResponse:
+        """List collections with preview metadata and floor prices."""
         return await self._transport.request(
             "GET",
             "/partners/collections/preview",
@@ -127,6 +142,7 @@ class AsyncCollections:
         from_: datetime | str | None = None,
         to: datetime | str | None = None,
     ) -> CollectionMetricsResponse:
+        """Fetch historical volume and price metrics for a collection."""
         return await self._transport.request(
             "GET",
             f"/partners/collections/{quote(collection_id, safe='')}/metrics",

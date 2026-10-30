@@ -16,10 +16,13 @@ from ._helpers import batch
 
 
 class Arena:
+    """Synchronous Arena resource (`/partners/arena/*`)."""
+
     def __init__(self, transport: SyncTransport) -> None:
         self._transport = transport
 
     def state(self) -> ArenaStateResponse:
+        """Fetch the current Arena rooms, active games, and server time."""
         return self._transport.request(
             "GET", "/partners/arena/state", response_model=ArenaStateResponse
         )
@@ -35,6 +38,7 @@ class Arena:
         collection: Sequence[str] | None = None,
         sort_by: str | None = None,
     ) -> ArenaInventoryResponse:
+        """List gifts available for Arena betting."""
         if limit is not None and not 1 <= limit <= 150:
             raise ValueError("limit must be between 1 and 150")
         params = {
@@ -61,6 +65,7 @@ class Arena:
         gift_ids: Sequence[str] | None = None,
         team_id: str | None = None,
     ) -> ArenaBetResponse:
+        """Place a TON or gift bet in an Arena room (provide `amount` or `gift_ids`, not both)."""
         request = _bet_request(room_id, amount, gift_ids, team_id)
         return self._transport.request(
             "POST", "/partners/arena/bet", json_data=request, response_model=ArenaBetResponse
@@ -68,10 +73,13 @@ class Arena:
 
 
 class AsyncArena:
+    """Asynchronous Arena resource (`/partners/arena/*`)."""
+
     def __init__(self, transport: AsyncTransport) -> None:
         self._transport = transport
 
     async def state(self) -> ArenaStateResponse:
+        """Fetch the current Arena rooms, active games, and server time."""
         return await self._transport.request(
             "GET", "/partners/arena/state", response_model=ArenaStateResponse
         )
@@ -87,6 +95,7 @@ class AsyncArena:
         collection: Sequence[str] | None = None,
         sort_by: str | None = None,
     ) -> ArenaInventoryResponse:
+        """List gifts available for Arena betting."""
         if limit is not None and not 1 <= limit <= 150:
             raise ValueError("limit must be between 1 and 150")
         params = {
@@ -113,6 +122,7 @@ class AsyncArena:
         gift_ids: Sequence[str] | None = None,
         team_id: str | None = None,
     ) -> ArenaBetResponse:
+        """Place a TON or gift bet in an Arena room (provide `amount` or `gift_ids`, not both)."""
         request = _bet_request(room_id, amount, gift_ids, team_id)
         return await self._transport.request(
             "POST", "/partners/arena/bet", json_data=request, response_model=ArenaBetResponse

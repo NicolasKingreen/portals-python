@@ -20,6 +20,16 @@ _T = TypeVar("_T")
 
 
 class PortalsClient:
+    """Synchronous client for the Portals Partners API.
+
+    Args:
+        api_key: Partner API token sent as `Authorization: partners <api_key>`.
+        base_url: Base URL for the Portals API.
+        timeout: Request timeout in seconds or an `httpx2.Timeout` instance.
+        client: Optional pre-configured `httpx2.Client`. When provided, the
+            caller retains ownership and is responsible for closing it.
+    """
+
     def __init__(
         self,
         api_key: str,
@@ -39,6 +49,7 @@ class PortalsClient:
 
     @property
     def last_rate_limit(self) -> RateLimit | None:
+        """Rate-limit metadata parsed from the most recent HTTP response, if present."""
         return self._transport.last_rate_limit
 
     @overload
@@ -72,6 +83,7 @@ class PortalsClient:
         json_data: Any = None,
         response_model: Any = None,
     ) -> Any:
+        """Send an arbitrary request to the Portals API and optionally validate the response."""
         return self._transport.request(
             method,
             path,
@@ -81,6 +93,7 @@ class PortalsClient:
         )
 
     def close(self) -> None:
+        """Close the underlying HTTP client if it was created by this instance."""
         self._transport.close()
 
     def __enter__(self) -> PortalsClient:
@@ -96,6 +109,16 @@ class PortalsClient:
 
 
 class AsyncPortalsClient:
+    """Asynchronous client for the Portals Partners API.
+
+    Args:
+        api_key: Partner API token sent as `Authorization: partners <api_key>`.
+        base_url: Base URL for the Portals API.
+        timeout: Request timeout in seconds or an `httpx2.Timeout` instance.
+        client: Optional pre-configured `httpx2.AsyncClient`. When provided, the
+            caller retains ownership and is responsible for closing it.
+    """
+
     def __init__(
         self,
         api_key: str,
@@ -115,6 +138,7 @@ class AsyncPortalsClient:
 
     @property
     def last_rate_limit(self) -> RateLimit | None:
+        """Rate-limit metadata parsed from the most recent HTTP response, if present."""
         return self._transport.last_rate_limit
 
     @overload
@@ -148,6 +172,7 @@ class AsyncPortalsClient:
         json_data: Any = None,
         response_model: Any = None,
     ) -> Any:
+        """Send an arbitrary request to the Portals API and optionally validate the response."""
         return await self._transport.request(
             method,
             path,
@@ -157,6 +182,7 @@ class AsyncPortalsClient:
         )
 
     async def aclose(self) -> None:
+        """Close the underlying async HTTP client if it was created by this instance."""
         await self._transport.aclose()
 
     async def __aenter__(self) -> AsyncPortalsClient:

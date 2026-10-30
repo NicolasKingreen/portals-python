@@ -9,10 +9,13 @@ from ._helpers import market_query
 
 
 class Market:
+    """Synchronous market resource (`/partners/market/*`)."""
+
     def __init__(self, transport: SyncTransport) -> None:
         self._transport = transport
 
     def config(self) -> MarketConfig:
+        """Fetch marketplace configuration, commission rates, and exchange rates."""
         return self._transport.request(
             "GET", "/partners/market/config", response_model=MarketConfig
         )
@@ -35,6 +38,7 @@ class Market:
         sort_by: str | None = None,
         status: str | None = None,
     ) -> MarketActionsResponse:
+        """Fetch the anonymized global marketplace activity feed (1 <= limit <= 20, 0 <= offset <= 700)."""
         _validate_feed_window(limit, offset)
         params = market_query(
             action_types=action_types,
@@ -61,10 +65,13 @@ class Market:
 
 
 class AsyncMarket:
+    """Asynchronous market resource (`/partners/market/*`)."""
+
     def __init__(self, transport: AsyncTransport) -> None:
         self._transport = transport
 
     async def config(self) -> MarketConfig:
+        """Fetch marketplace configuration, commission rates, and exchange rates."""
         return await self._transport.request(
             "GET", "/partners/market/config", response_model=MarketConfig
         )
@@ -87,6 +94,7 @@ class AsyncMarket:
         sort_by: str | None = None,
         status: str | None = None,
     ) -> MarketActionsResponse:
+        """Fetch the anonymized global marketplace activity feed (1 <= limit <= 20, 0 <= offset <= 700)."""
         _validate_feed_window(limit, offset)
         params = market_query(
             action_types=action_types,

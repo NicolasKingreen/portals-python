@@ -32,25 +32,34 @@ Amount = Annotated[
 
 
 class PortalsModel(BaseModel):
+    """Common Pydantic base model for Portals API schemas."""
+
     model_config = ConfigDict(populate_by_name=True)
 
 
 class PortalsRequest(PortalsModel):
+    """Base model for API request payloads (`extra="forbid"`)."""
+
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
 class PortalsResponse(PortalsModel):
+    """Base model for API response payloads (`extra="allow"`)."""
+
     model_config = ConfigDict(extra="allow", populate_by_name=True)
 
 
 @dataclass(frozen=True, slots=True)
 class RateLimit:
+    """Rate-limit state parsed from `X-RateLimit-*` response headers."""
+
     limit: int
     remaining: int
     reset_seconds: int
 
     @classmethod
     def from_headers(cls, headers: Mapping[str, str]) -> RateLimit | None:
+        """Parse rate-limit headers from an HTTP response, or return `None` if absent."""
         normalized = {key.lower(): value for key, value in headers.items()}
         try:
             return cls(

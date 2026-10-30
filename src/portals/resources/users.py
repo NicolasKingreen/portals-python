@@ -10,10 +10,13 @@ from .market import _validate_feed_window
 
 
 class Users:
+    """Synchronous users resource (`/partners/users/*`)."""
+
     def __init__(self, transport: SyncTransport) -> None:
         self._transport = transport
 
     def exists(self, user_id: int) -> UserExistence:
+        """Check whether a Telegram user ID is registered on Portals."""
         return self._transport.request(
             "GET", f"/partners/users/{user_id}", response_model=UserExistence
         )
@@ -35,6 +38,7 @@ class Users:
         period: str | None = None,
         status: str | None = None,
     ) -> UserActionsResponse:
+        """Fetch activity history for the authenticated user (1 <= limit <= 20, 0 <= offset <= 700)."""
         _validate_feed_window(limit, offset)
         params = market_query(
             action_types=action_types,
@@ -60,10 +64,13 @@ class Users:
 
 
 class AsyncUsers:
+    """Asynchronous users resource (`/partners/users/*`)."""
+
     def __init__(self, transport: AsyncTransport) -> None:
         self._transport = transport
 
     async def exists(self, user_id: int) -> UserExistence:
+        """Check whether a Telegram user ID is registered on Portals."""
         return await self._transport.request(
             "GET", f"/partners/users/{user_id}", response_model=UserExistence
         )
@@ -85,6 +92,7 @@ class AsyncUsers:
         period: str | None = None,
         status: str | None = None,
     ) -> UserActionsResponse:
+        """Fetch activity history for the authenticated user (1 <= limit <= 20, 0 <= offset <= 700)."""
         _validate_feed_window(limit, offset)
         params = market_query(
             action_types=action_types,

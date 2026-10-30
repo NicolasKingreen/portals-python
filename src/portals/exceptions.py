@@ -6,26 +6,32 @@ from ._models import RateLimit
 
 
 class PortalsError(Exception):
-    pass
+    """Base exception for all errors raised by the Portals client."""
 
 
 class TransportError(PortalsError):
+    """Raised when an underlying network or HTTP transport operation fails."""
+
     def __init__(self, message: str, *, original: BaseException | None = None) -> None:
         super().__init__(message)
         self.original = original
 
 
 class InvalidResponseError(PortalsError):
-    pass
+    """Raised when the API returns non-JSON content where JSON was expected."""
 
 
 class ResponseValidationError(InvalidResponseError):
+    """Raised when a JSON response payload fails Pydantic model validation."""
+
     def __init__(self, message: str, *, response: Any = None) -> None:
         super().__init__(message)
         self.response = response
 
 
 class APIError(PortalsError):
+    """Raised when the Portals API returns an HTTP 4xx or 5xx error response."""
+
     def __init__(
         self,
         message: str,
@@ -44,20 +50,20 @@ class APIError(PortalsError):
 
 
 class AuthenticationError(APIError):
-    pass
+    """Raised on HTTP 401 responses when the API key is missing or invalid."""
 
 
 class AccessDeniedError(APIError):
-    pass
+    """Raised on HTTP 403 responses when the API key lacks permission."""
 
 
 class RateLimitError(APIError):
-    pass
+    """Raised on HTTP 429 responses when the rate limit is exceeded."""
 
 
 class MarketFeedUnavailableError(APIError):
-    pass
+    """Raised on HTTP 503 `MARKET_FEED_UNAVAILABLE` responses."""
 
 
 class BetOutcomeUnknownError(APIError):
-    pass
+    """Raised on HTTP 504 `BET_OUTCOME_UNKNOWN` when an Arena bet outcome timed out."""
