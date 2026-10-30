@@ -57,17 +57,38 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
+          # TestPyPI keeps every upload, so re-running a release after a failed smoke test would
+          # otherwise abort on "File already exists". PyPI stays strict (no skip-existing).
+          skip-existing: true
       - uses: astral-sh/setup-uv@v7
       - run: uv python install 3.13
       - name: Smoke-install from TestPyPI
         run: |
           PACKAGE_VERSION="$(python3 -c 'import glob, os; whl = glob.glob("dist/*.whl")[0]; print(os.path.basename(whl).split("-")[1])')"
+          echo "smoke-testing portals-api==${PACKAGE_VERSION}"
           uv venv /tmp/testpypi-smoke --python 3.13
-          uv pip install \
-            --python /tmp/testpypi-smoke/bin/python \
-            --index-url https://test.pypi.org/simple/ \
-            --extra-index-url https://pypi.org/simple/ \
-            "portals-api==${PACKAGE_VERSION}"
+          # `portals-api` also exists on PyPI, and uv's default `first-index` strategy stops at the
+          # first index that has the package, so TestPyPI would never be consulted. Best-match lets
+          # TestPyPI supply the new version while the exact pin keeps us on this release; deps come
+          # from PyPI as usual.
+          installed=0
+          for attempt in 1 2 3 4 5; do
+            if uv pip install \
+              --python /tmp/testpypi-smoke/bin/python \
+              --index-url https://test.pypi.org/simple/ \
+              --extra-index-url https://pypi.org/simple/ \
+              --index-strategy unsafe-best-match \
+              "portals-api==${PACKAGE_VERSION}"; then
+              installed=1
+              break
+            fi
+            echo "install attempt ${attempt} failed; retrying in 15s" >&2
+            sleep 15
+          done
+          if [ "${installed}" != "1" ]; then
+            echo "error: could not install portals-api==${PACKAGE_VERSION} from TestPyPI" >&2
+            exit 1
+          fi
           /tmp/testpypi-smoke/bin/python -c "import httpx2, portals; assert portals.__version__ == '${PACKAGE_VERSION}'"
 
   publish-pypi:
