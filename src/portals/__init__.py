@@ -1,6 +1,7 @@
 from . import models as _models
 from ._contract import __api_version__
 from ._models import Amount, RateLimit
+from ._version import __version__
 from .client import AsyncPortalsClient, PortalsClient
 from .exceptions import (
     AccessDeniedError,
@@ -15,8 +16,6 @@ from .exceptions import (
     TransportError,
 )
 from .models import *  # noqa: F403
-
-__version__ = "0.1.0"
 
 __all__ = [
     "AccessDeniedError",

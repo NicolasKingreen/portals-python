@@ -13,6 +13,7 @@ import httpx2
 from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from ._models import RateLimit
+from ._version import __version__
 from .exceptions import (
     AccessDeniedError,
     APIError,
@@ -78,7 +79,7 @@ class BaseTransport:
         self._headers = {
             "Authorization": f"partners {api_key}",
             "Accept": "application/json",
-            "User-Agent": "portals-api-python/0.1.0",
+            "User-Agent": f"portals-api-python/{__version__}",
         }
         self.last_rate_limit: RateLimit | None = None
 

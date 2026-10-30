@@ -84,5 +84,7 @@ def test_rate_limit_from_headers() -> None:
 
 
 def test_package_versions_exposed() -> None:
-    assert portals.__version__ == "0.1.0"
+    from importlib.metadata import version
+
+    assert portals.__version__ == version("portals-api")
     assert portals.__api_version__ == "1.0.0"

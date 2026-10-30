@@ -48,4 +48,4 @@ jobs:
         run: |
           uv venv /tmp/wheel-smoke --python ${{ matrix.python-version }}
           uv pip install --python /tmp/wheel-smoke/bin/python dist/*.whl
-          /tmp/wheel-smoke/bin/python -c "import httpx2, portals; assert portals.__version__ == '0.1.0'; assert portals.__api_version__ == '1.0.0'"
+          /tmp/wheel-smoke/bin/python -c "from importlib.metadata import version; import httpx2, portals; assert portals.__version__ == version('portals-api'); assert portals.__api_version__ == '1.0.0'"

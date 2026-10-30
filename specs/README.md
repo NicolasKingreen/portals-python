@@ -33,5 +33,5 @@ review. `--source URL` points at a mirror.
 ## Versioning
 
 The contract version in `info.version` is independent of the `portals-api` package version.
-The package follows [Semantic Versioning](https://semver.org/). Release notes record the
+The package follows [Semantic Versioning](https://semver.org/); see `CHANGELOG.md` for the
 contract version each release was generated from.

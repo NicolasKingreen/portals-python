@@ -6,6 +6,7 @@ from decimal import Decimal
 import httpx2
 import pytest
 
+import portals
 from portals import (
     AsyncPortalsClient,
     InvalidResponseError,
@@ -104,7 +105,7 @@ def test_headers_and_empty_responses() -> None:
     assert str(first.url) == "https://example.test/partners/users/wallets/"
     assert first.headers["Authorization"] == "partners secret-key"
     assert first.headers["Accept"] == "application/json"
-    assert first.headers["User-Agent"].startswith("portals-api-python/")
+    assert first.headers["User-Agent"] == f"portals-api-python/{portals.__version__}"
 
 
 def test_invalid_json_and_validation_error() -> None:
