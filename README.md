@@ -7,10 +7,10 @@ A typed synchronous and asynchronous Python client for the [Portals Partners API
 - All 35 operations from the Portals Partners OpenAPI contract
 - Matching `PortalsClient` and `AsyncPortalsClient` APIs
 - Typed Pydantic v2 models for all 87 schemas
-- HTTPX connection pooling and injectable HTTP clients
+- httpx2 connection pooling and injectable HTTP clients
 - Exact `Decimal` amounts and parsed `datetime` timestamps
 - Typed API errors and rate-limit metadata
-- Python 3.10+ and a `py.typed` marker
+- Python 3.11+ and a `py.typed` marker
 
 ## Installation
 
@@ -126,14 +126,14 @@ Write operations are not automatically retried. In particular, an Arena bet that
 
 ## Custom HTTP clients
 
-Pass an `httpx.Client` or `httpx.AsyncClient` to customize transports, proxies, or test behavior. The library closes only clients it creates itself.
+Pass an `httpx2.Client` or `httpx2.AsyncClient` to customize transports, proxies, or test behavior. The library closes only clients it creates itself.
 
 ```python
-import httpx
+import httpx2
 
 from portals import PortalsClient
 
-http_client = httpx.Client(timeout=10)
+http_client = httpx2.Client(timeout=10)
 client = PortalsClient("your-api-key", client=http_client)
 
 client.close()

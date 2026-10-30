@@ -7,12 +7,12 @@ name = "portals-api"
 version = "0.1.0"
 description = "A typed Python client for the Portals Partners API"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "MIT"
 authors = [{ name = "Portals API client contributors" }]
 keywords = ["portals", "telegram", "ton", "nft", "api", "asyncio"]
 dependencies = [
-    "httpx>=0.27,<1",
+    "httpx2>=2.16,<3",
     "pydantic>=2.8,<3",
 ]
 classifiers = [
@@ -20,7 +20,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -47,7 +46,7 @@ where = ["src"]
 portals = ["py.typed"]
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 line-length = 100
 
 [tool.ruff.lint]
@@ -55,4 +54,5 @@ select = ["E", "F", "I", "UP", "B", "RUF"]
 ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
-"src/portals/models.py" = ["RUF022"]
+# Generated enums still use `str, Enum`; switching to StrEnum is tracked separately.
+"src/portals/models.py" = ["RUF022", "UP042"]

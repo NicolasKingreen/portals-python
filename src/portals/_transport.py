@@ -9,7 +9,7 @@ from enum import Enum
 from functools import cache
 from typing import Any
 
-import httpx
+import httpx2
 from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from ._models import RateLimit
@@ -66,7 +66,7 @@ class BaseTransport:
         api_key: str,
         *,
         base_url: str,
-        timeout: float | httpx.Timeout,
+        timeout: float | httpx2.Timeout,
     ) -> None:
         if not api_key.strip():
             raise ValueError("api_key must not be empty")
@@ -84,7 +84,7 @@ class BaseTransport:
             raise ValueError("path must start with '/'")
         return f"{self._base_url}{path}"
 
-    def _handle_response(self, response: httpx.Response, response_model: Any) -> Any:
+    def _handle_response(self, response: httpx2.Response, response_model: Any) -> Any:
         self.last_rate_limit = RateLimit.from_headers(response.headers)
         if response.status_code >= 400:
             self._raise_api_error(response)
@@ -105,7 +105,7 @@ class BaseTransport:
                 response=data,
             ) from exc
 
-    def _raise_api_error(self, response: httpx.Response) -> None:
+    def _raise_api_error(self, response: httpx2.Response) -> None:
         try:
             data = response.json() if response.content else None
         except ValueError:
@@ -148,19 +148,19 @@ class SyncTransport(BaseTransport):
         api_key: str,
         *,
         base_url: str,
-        timeout: float | httpx.Timeout,
-        client: httpx.Client | None = None,
+        timeout: float | httpx2.Timeout,
+        client: httpx2.Client | None = None,
     ) -> None:
         super().__init__(api_key, base_url=base_url, timeout=timeout)
         self._client = client
         self._owns_client = client is None
         self._lock = threading.Lock()
 
-    def _get_client(self) -> httpx.Client:
+    def _get_client(self) -> httpx2.Client:
         if self._client is None:
             with self._lock:
                 if self._client is None:
-                    self._client = httpx.Client(timeout=self._timeout)
+                    self._client = httpx2.Client(timeout=self._timeout)
         return self._client
 
     def request(
@@ -183,7 +183,7 @@ class SyncTransport(BaseTransport):
                 headers=self._headers,
                 timeout=self._timeout,
             )
-        except httpx.HTTPError as exc:
+        except httpx2.HTTPError as exc:
             raise TransportError(f"Could not reach the Portals API: {exc}", original=exc) from exc
         return self._handle_response(response, response_model)
 
@@ -199,19 +199,19 @@ class AsyncTransport(BaseTransport):
         api_key: str,
         *,
         base_url: str,
-        timeout: float | httpx.Timeout,
-        client: httpx.AsyncClient | None = None,
+        timeout: float | httpx2.Timeout,
+        client: httpx2.AsyncClient | None = None,
     ) -> None:
         super().__init__(api_key, base_url=base_url, timeout=timeout)
         self._client = client
         self._owns_client = client is None
         self._lock = asyncio.Lock()
 
-    async def _get_client(self) -> httpx.AsyncClient:
+    async def _get_client(self) -> httpx2.AsyncClient:
         if self._client is None:
             async with self._lock:
                 if self._client is None:
-                    self._client = httpx.AsyncClient(timeout=self._timeout)
+                    self._client = httpx2.AsyncClient(timeout=self._timeout)
         return self._client
 
     async def request(
@@ -235,7 +235,7 @@ class AsyncTransport(BaseTransport):
                 headers=self._headers,
                 timeout=self._timeout,
             )
-        except httpx.HTTPError as exc:
+        except httpx2.HTTPError as exc:
             raise TransportError(f"Could not reach the Portals API: {exc}", original=exc) from exc
         return self._handle_response(response, response_model)
 

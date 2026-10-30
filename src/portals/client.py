@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from types import TracebackType
 from typing import Any
 
-import httpx
+import httpx2
 
 from ._models import RateLimit
 from ._transport import AsyncTransport, SyncTransport
@@ -23,8 +23,8 @@ class PortalsClient:
         api_key: str,
         *,
         base_url: str = "https://portal-market.com",
-        timeout: float | httpx.Timeout = 30.0,
-        client: httpx.Client | None = None,
+        timeout: float | httpx2.Timeout = 30.0,
+        client: httpx2.Client | None = None,
     ) -> None:
         self._transport = SyncTransport(api_key, base_url=base_url, timeout=timeout, client=client)
         self.arena = Arena(self._transport)
@@ -77,8 +77,8 @@ class AsyncPortalsClient:
         api_key: str,
         *,
         base_url: str = "https://portal-market.com",
-        timeout: float | httpx.Timeout = 30.0,
-        client: httpx.AsyncClient | None = None,
+        timeout: float | httpx2.Timeout = 30.0,
+        client: httpx2.AsyncClient | None = None,
     ) -> None:
         self._transport = AsyncTransport(api_key, base_url=base_url, timeout=timeout, client=client)
         self.arena = AsyncArena(self._transport)
