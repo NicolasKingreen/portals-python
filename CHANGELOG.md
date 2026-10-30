@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-31
+
 API contract: 1.0.0
 
 ### Added
@@ -25,4 +27,5 @@ API contract: 1.0.0
 - Vendored OpenAPI contract under `specs/partners.en.json` with `scripts/update_spec.py` and
   `scripts/generate_models.py`.
 
-[Unreleased]: https://github.com/NicolasKingreen/portals-python/commits/main
+[Unreleased]: https://github.com/NicolasKingreen/portals-python/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/NicolasKingreen/portals-python/releases/tag/v0.1.0
