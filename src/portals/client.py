@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from types import TracebackType
-from typing import Any
+from typing import Any, TypeVar, overload
 
 import httpx2
 
@@ -15,6 +15,8 @@ from .resources.market import AsyncMarket, Market
 from .resources.nfts import AsyncNFTs, NFTs
 from .resources.users import AsyncUsers, Users
 from .resources.wallet import AsyncWalletResource, WalletResource
+
+_T = TypeVar("_T")
 
 
 class PortalsClient:
@@ -38,6 +40,28 @@ class PortalsClient:
     @property
     def last_rate_limit(self) -> RateLimit | None:
         return self._transport.last_rate_limit
+
+    @overload
+    def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        params: Mapping[str, Any] | None = None,
+        json_data: Any = None,
+        response_model: None = None,
+    ) -> Any: ...
+
+    @overload
+    def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        params: Mapping[str, Any] | None = None,
+        json_data: Any = None,
+        response_model: type[_T],
+    ) -> _T: ...
 
     def request(
         self,
@@ -92,6 +116,28 @@ class AsyncPortalsClient:
     @property
     def last_rate_limit(self) -> RateLimit | None:
         return self._transport.last_rate_limit
+
+    @overload
+    async def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        params: Mapping[str, Any] | None = None,
+        json_data: Any = None,
+        response_model: None = None,
+    ) -> Any: ...
+
+    @overload
+    async def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        params: Mapping[str, Any] | None = None,
+        json_data: Any = None,
+        response_model: type[_T],
+    ) -> _T: ...
 
     async def request(
         self,

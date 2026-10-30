@@ -11,6 +11,7 @@ from ..models import (
     Wallet,
     WithdrawTONRequest,
 )
+from ._helpers import amount as _amount
 
 
 class WalletResource:
@@ -23,8 +24,8 @@ class WalletResource:
     def create_deposit(self) -> Deposit:
         return self._transport.request("POST", "/partners/deposits", response_model=Deposit)
 
-    def withdraw(self, *, amount: Amount, external_address: str) -> TONWithdrawal:
-        request = WithdrawTONRequest(amount=amount, external_address=external_address)
+    def withdraw(self, *, amount: Amount | str, external_address: str) -> TONWithdrawal:
+        request = WithdrawTONRequest(amount=_amount(amount), external_address=external_address)
         return self._transport.request(
             "POST",
             "/partners/users/wallets/withdraw",
@@ -55,8 +56,8 @@ class AsyncWalletResource:
     async def create_deposit(self) -> Deposit:
         return await self._transport.request("POST", "/partners/deposits", response_model=Deposit)
 
-    async def withdraw(self, *, amount: Amount, external_address: str) -> TONWithdrawal:
-        request = WithdrawTONRequest(amount=amount, external_address=external_address)
+    async def withdraw(self, *, amount: Amount | str, external_address: str) -> TONWithdrawal:
+        request = WithdrawTONRequest(amount=_amount(amount), external_address=external_address)
         return await self._transport.request(
             "POST",
             "/partners/users/wallets/withdraw",

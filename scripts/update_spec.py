@@ -36,7 +36,8 @@ def read_source(source: str) -> bytes:
         },
     )
     with urlopen(request, timeout=30.0) as response:
-        return response.read()
+        data: bytes = response.read()
+        return data
 
 
 def normalize(raw: bytes) -> bytes:

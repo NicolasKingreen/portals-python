@@ -1,20 +1,22 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Any
+from decimal import Decimal
+from typing import Any, TypeVar
 
 from pydantic import TypeAdapter
 
 from .._models import Amount
 
-_amount_adapter = TypeAdapter(Amount)
+_amount_adapter: TypeAdapter[Decimal] = TypeAdapter(Amount)
+_T = TypeVar("_T")
 
 
-def amount(value: Amount) -> Any:
+def amount(value: Amount | str) -> Decimal:
     return _amount_adapter.validate_python(value)
 
 
-def batch(values: Sequence[Any], name: str, maximum: int = 50) -> tuple[Any, ...]:
+def batch(values: Sequence[_T], name: str, maximum: int = 50) -> tuple[_T, ...]:
     result = tuple(values)
     if not 1 <= len(result) <= maximum:
         raise ValueError(f"{name} must contain between 1 and {maximum} items")
@@ -31,8 +33,8 @@ def nft_query(
     filter_by_symbols: Sequence[str] | None,
     ids: Sequence[str] | None,
     limit: int | None,
-    max_price: Amount | None,
-    min_price: Amount | None,
+    max_price: Amount | str | None,
+    min_price: Amount | str | None,
     mint_status: str | None,
     name_filter: str | None,
     offset: int | None,
@@ -78,8 +80,8 @@ def market_query(
     filter_by_models: Sequence[str] | None,
     filter_by_symbols: Sequence[str] | None,
     limit: int | None,
-    max_price: Amount | None,
-    min_price: Amount | None,
+    max_price: Amount | str | None,
+    min_price: Amount | str | None,
     offset: int | None,
     period: str | None,
     status: str | None,

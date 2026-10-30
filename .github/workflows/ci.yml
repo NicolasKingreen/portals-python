@@ -20,9 +20,15 @@ jobs:
       - run: uv sync --locked
       - run: uv run ruff check .
       - run: uv run ruff format --check .
-      - run: uv run mypy src/portals
+      - run: uv run mypy
+      - name: Check generated models are up to date
+        run: |
+          uv run python scripts/generate_models.py
+          uv run ruff check --fix src/portals/models.py src/portals/_contract.py
+          uv run ruff format src/portals/models.py src/portals/_contract.py
+          git diff --exit-code
 
-  build:
+  test:
     needs: quality
     runs-on: ubuntu-latest
     strategy:
@@ -35,6 +41,11 @@ jobs:
         with:
           enable-cache: true
       - run: uv python install ${{ matrix.python-version }}
-      - run: uv sync --locked
+      - run: uv sync --locked --python ${{ matrix.python-version }}
+      - run: uv run --python ${{ matrix.python-version }} pytest --cov=portals
       - run: uv build
-      - run: uv run python -c "import portals; assert portals.__version__ == '0.1.0'"
+      - name: Smoke-test built wheel in clean environment
+        run: |
+          uv venv /tmp/wheel-smoke --python ${{ matrix.python-version }}
+          uv pip install --python /tmp/wheel-smoke/bin/python dist/*.whl
+          /tmp/wheel-smoke/bin/python -c "import httpx2, portals; assert portals.__version__ == '0.1.0'; assert portals.__api_version__ == '1.0.0'"

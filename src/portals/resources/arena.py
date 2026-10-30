@@ -11,6 +11,7 @@ from ..models import (
     ArenaInventoryResponse,
     ArenaStateResponse,
 )
+from ._helpers import amount as _amount
 from ._helpers import batch
 
 
@@ -56,7 +57,7 @@ class Arena:
         self,
         *,
         room_id: int,
-        amount: Amount | None = None,
+        amount: Amount | str | None = None,
         gift_ids: Sequence[str] | None = None,
         team_id: str | None = None,
     ) -> ArenaBetResponse:
@@ -108,7 +109,7 @@ class AsyncArena:
         self,
         *,
         room_id: int,
-        amount: Amount | None = None,
+        amount: Amount | str | None = None,
         gift_ids: Sequence[str] | None = None,
         team_id: str | None = None,
     ) -> ArenaBetResponse:
@@ -120,13 +121,15 @@ class AsyncArena:
 
 def _bet_request(
     room_id: int,
-    amount: Amount | None,
+    amount: Amount | str | None,
     gift_ids: Sequence[str] | None,
     team_id: str | None,
 ) -> ArenaBetRequest:
     if (amount is None) == (gift_ids is None):
         raise ValueError("Provide exactly one of amount or gift_ids")
     if amount is not None:
-        return ArenaBetRequest(room_id=room_id, bet_type="ton", amount=amount, team_id=team_id)
+        return ArenaBetRequest(
+            room_id=room_id, bet_type="ton", amount=_amount(amount), team_id=team_id
+        )
     gifts = list(batch(gift_ids or (), "gift_ids"))
     return ArenaBetRequest(room_id=room_id, bet_type="gift", gift_ids=gifts, team_id=team_id)

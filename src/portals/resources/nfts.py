@@ -24,6 +24,7 @@ from ..models import (
     WithdrawGiftsRequest,
     WithdrawGiftsResponse,
 )
+from ._helpers import amount as _amount
 from ._helpers import batch, nft_query
 
 
@@ -43,8 +44,8 @@ class NFTs:
         ids: Sequence[str] | None = None,
         is_owned: bool | None = None,
         limit: int | None = 20,
-        max_price: Amount | None = None,
-        min_price: Amount | None = None,
+        max_price: Amount | str | None = None,
+        min_price: Amount | str | None = None,
         mint_status: str | None = None,
         name_filter: str | None = None,
         offset: int | None = None,
@@ -90,8 +91,8 @@ class NFTs:
         filter_by_symbols: Sequence[str] | None = None,
         ids: Sequence[str] | None = None,
         limit: int | None = 20,
-        max_price: Amount | None = None,
-        min_price: Amount | None = None,
+        max_price: Amount | str | None = None,
+        min_price: Amount | str | None = None,
         mint_status: str | None = None,
         name_filter: str | None = None,
         offset: int | None = None,
@@ -208,14 +209,14 @@ class NFTs:
             response_model=WithdrawalStatusesResponse,
         )
 
-    def list(self, nft_id: str, *, price: Amount) -> None:
+    def list(self, nft_id: str, *, price: Amount | str) -> None:
         path = f"/partners/nfts/{quote(nft_id, safe='')}/list"
-        request = ListNFTRequest(price=price)
-        return self._transport.request("POST", path, json_data=request)
+        request = ListNFTRequest(price=_amount(price))
+        self._transport.request("POST", path, json_data=request)
 
     def unlist(self, nft_id: str) -> None:
         path = f"/partners/nfts/{quote(nft_id, safe='')}/unlist"
-        return self._transport.request("POST", path)
+        self._transport.request("POST", path)
 
 
 class AsyncNFTs:
@@ -234,8 +235,8 @@ class AsyncNFTs:
         ids: Sequence[str] | None = None,
         is_owned: bool | None = None,
         limit: int | None = 20,
-        max_price: Amount | None = None,
-        min_price: Amount | None = None,
+        max_price: Amount | str | None = None,
+        min_price: Amount | str | None = None,
         mint_status: str | None = None,
         name_filter: str | None = None,
         offset: int | None = None,
@@ -281,8 +282,8 @@ class AsyncNFTs:
         filter_by_symbols: Sequence[str] | None = None,
         ids: Sequence[str] | None = None,
         limit: int | None = 20,
-        max_price: Amount | None = None,
-        min_price: Amount | None = None,
+        max_price: Amount | str | None = None,
+        min_price: Amount | str | None = None,
         mint_status: str | None = None,
         name_filter: str | None = None,
         offset: int | None = None,
@@ -399,14 +400,14 @@ class AsyncNFTs:
             response_model=WithdrawalStatusesResponse,
         )
 
-    async def list(self, nft_id: str, *, price: Amount) -> None:
+    async def list(self, nft_id: str, *, price: Amount | str) -> None:
         path = f"/partners/nfts/{quote(nft_id, safe='')}/list"
-        request = ListNFTRequest(price=price)
-        return await self._transport.request("POST", path, json_data=request)
+        request = ListNFTRequest(price=_amount(price))
+        await self._transport.request("POST", path, json_data=request)
 
     async def unlist(self, nft_id: str) -> None:
         path = f"/partners/nfts/{quote(nft_id, safe='')}/unlist"
-        return await self._transport.request("POST", path)
+        await self._transport.request("POST", path)
 
 
 _T = TypeVar("_T")

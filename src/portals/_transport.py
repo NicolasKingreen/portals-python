@@ -7,7 +7,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
 from functools import cache
-from typing import Any
+from typing import Any, TypeVar, overload
 
 import httpx2
 from pydantic import BaseModel, TypeAdapter, ValidationError
@@ -29,6 +29,9 @@ from .exceptions import (
 @cache
 def _adapter(model: Any) -> TypeAdapter[Any]:
     return TypeAdapter(model)
+
+
+_T = TypeVar("_T")
 
 
 def dump_model(model: BaseModel) -> dict[str, Any]:
@@ -163,6 +166,28 @@ class SyncTransport(BaseTransport):
                     self._client = httpx2.Client(timeout=self._timeout)
         return self._client
 
+    @overload
+    def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        params: Mapping[str, Any] | None = None,
+        json_data: Any = None,
+        response_model: None = None,
+    ) -> Any: ...
+
+    @overload
+    def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        params: Mapping[str, Any] | None = None,
+        json_data: Any = None,
+        response_model: type[_T],
+    ) -> _T: ...
+
     def request(
         self,
         method: str,
@@ -213,6 +238,28 @@ class AsyncTransport(BaseTransport):
                 if self._client is None:
                     self._client = httpx2.AsyncClient(timeout=self._timeout)
         return self._client
+
+    @overload
+    async def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        params: Mapping[str, Any] | None = None,
+        json_data: Any = None,
+        response_model: None = None,
+    ) -> Any: ...
+
+    @overload
+    async def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        params: Mapping[str, Any] | None = None,
+        json_data: Any = None,
+        response_model: type[_T],
+    ) -> _T: ...
 
     async def request(
         self,

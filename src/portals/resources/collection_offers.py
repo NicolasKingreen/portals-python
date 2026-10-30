@@ -18,6 +18,7 @@ from ..models import (
     OfferAttribute,
     OfferCollectionsResponse,
 )
+from ._helpers import amount as _amount
 from ._helpers import batch
 
 
@@ -29,14 +30,14 @@ class CollectionOffers:
         self,
         *,
         collection_id: str,
-        amount: Amount,
+        amount: Amount | str,
         max_nfts: int,
         attributes: Sequence[OfferAttribute] | None = None,
         expiration_days: Literal[1, 7] | None = None,
     ) -> CollectionOffer:
         request = CreateOfferRequest(
             collection_id=collection_id,
-            amount=amount,
+            amount=_amount(amount),
             max_nfts=max_nfts,
             attributes=list(attributes) if attributes is not None else None,
             expiration_days=expiration_days,
@@ -62,9 +63,7 @@ class CollectionOffers:
 
     def cancel(self, offer_id: str) -> None:
         request = CancelOfferRequest(id=offer_id)
-        return self._transport.request(
-            "POST", "/partners/collection-offers/cancel", json_data=request
-        )
+        self._transport.request("POST", "/partners/collection-offers/cancel", json_data=request)
 
     def collections(self) -> OfferCollectionsResponse:
         return self._transport.request(
@@ -98,13 +97,13 @@ class CollectionOffers:
             "GET", path, params={"scope": scope}, response_model=CollectionOffer
         )
 
-    def accept(self, offer_id: str, *, amount: Amount, nft_ids: Sequence[str]) -> None:
+    def accept(self, offer_id: str, *, amount: Amount | str, nft_ids: Sequence[str]) -> None:
         ids = list(batch(nft_ids, "nft_ids"))
         if len(set(ids)) != len(ids):
             raise ValueError("nft_ids must not contain duplicates")
-        request = AcceptOfferRequest(amount=amount, nft_ids=ids)
+        request = AcceptOfferRequest(amount=_amount(amount), nft_ids=ids)
         path = f"/partners/collection-offers/{quote(offer_id, safe='')}/accept"
-        return self._transport.request("POST", path, json_data=request)
+        self._transport.request("POST", path, json_data=request)
 
 
 class AsyncCollectionOffers:
@@ -115,14 +114,14 @@ class AsyncCollectionOffers:
         self,
         *,
         collection_id: str,
-        amount: Amount,
+        amount: Amount | str,
         max_nfts: int,
         attributes: Sequence[OfferAttribute] | None = None,
         expiration_days: Literal[1, 7] | None = None,
     ) -> CollectionOffer:
         request = CreateOfferRequest(
             collection_id=collection_id,
-            amount=amount,
+            amount=_amount(amount),
             max_nfts=max_nfts,
             attributes=list(attributes) if attributes is not None else None,
             expiration_days=expiration_days,
@@ -148,7 +147,7 @@ class AsyncCollectionOffers:
 
     async def cancel(self, offer_id: str) -> None:
         request = CancelOfferRequest(id=offer_id)
-        return await self._transport.request(
+        await self._transport.request(
             "POST", "/partners/collection-offers/cancel", json_data=request
         )
 
@@ -184,10 +183,10 @@ class AsyncCollectionOffers:
             "GET", path, params={"scope": scope}, response_model=CollectionOffer
         )
 
-    async def accept(self, offer_id: str, *, amount: Amount, nft_ids: Sequence[str]) -> None:
+    async def accept(self, offer_id: str, *, amount: Amount | str, nft_ids: Sequence[str]) -> None:
         ids = list(batch(nft_ids, "nft_ids"))
         if len(set(ids)) != len(ids):
             raise ValueError("nft_ids must not contain duplicates")
-        request = AcceptOfferRequest(amount=amount, nft_ids=ids)
+        request = AcceptOfferRequest(amount=_amount(amount), nft_ids=ids)
         path = f"/partners/collection-offers/{quote(offer_id, safe='')}/accept"
-        return await self._transport.request("POST", path, json_data=request)
+        await self._transport.request("POST", path, json_data=request)
