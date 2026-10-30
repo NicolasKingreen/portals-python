@@ -167,10 +167,12 @@ uv run mypy src/portals
 uv build
 ```
 
-After updating `partners.en.json`, regenerate the models and review the resulting changes:
+The OpenAPI contract is vendored at `specs/partners.en.json`. Refresh it and regenerate the
+models, then review the resulting changes:
 
 ```bash
-python scripts/generate_models.py
+uv run python scripts/update_spec.py
+uv run python scripts/generate_models.py
 uv run ruff check --fix src/portals/models.py
 uv run ruff format src/portals/models.py
 ```

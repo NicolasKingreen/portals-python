@@ -1,0 +1,9 @@
+{
+  "source": "https://docs.portals.tg/api/partners.en.json",
+  "contract_version": "1.0.0",
+  "openapi": "3.0.0",
+  "sha256": "fa5d0974d6349d965a4a52945cae9003e11d1be187b014dbe24f8c51af7444f4",
+  "schemas": 87,
+  "paths": 35,
+  "operations": 35
+}

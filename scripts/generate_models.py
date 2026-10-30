@@ -247,7 +247,7 @@ from ._models import Amount, PortalsModel
 
 def main() -> None:
     root = Path(__file__).resolve().parent.parent
-    with (root / "partners.en.json").open() as file:
+    with (root / "specs" / "partners.en.json").open() as file:
         spec = json.load(file)
     schemas = spec["components"]["schemas"]
     missing = set(schemas) - set(CLASS_NAMES)
