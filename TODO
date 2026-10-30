@@ -1,0 +1,7 @@
+Rename client class to Portals/AsyncPortals
+Move to HTTPX2
+Publish on pypi
+Update CI
+Move to uv
+Maintain proper versioning
+Make installing possible with portals[aiohttp] and such

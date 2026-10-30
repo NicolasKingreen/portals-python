@@ -1,0 +1,5856 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "Interactive reference for the Portals Partners API. Every request needs the `Authorization: partners <token>` header. You get the key yourself in the Portals mini app: profile menu → Partner API. Plans, rate limits, errors and examples are in the [Partners API guide](/developers/api/).",
+    "title": "Portals Partners API",
+    "contact": {},
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/partners/arena/bet": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "tags": [
+          "arena"
+        ],
+        "summary": "Place an Arena bet in TON or gifts",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/httptrustedapps.arenaBetRequest"
+              }
+            }
+          },
+          "description": "Bet",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The bet is placed. acceptedAmount and room are null if they could not be read back.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/httptrustedapps.arenaBetResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Gift not found among your gifts: `GIFT_NOT_FOUND`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The gift cannot be bet now: `GIFT_UNAVAILABLE`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The bet is rejected. Invalid request body: message without `code`. Arena codes: `GAME_NOT_ACCEPTING_BETS`, `COUNTDOWN_TOO_CLOSE`, `MAX_PLAYERS_REACHED`, `BET_TOO_SMALL`, `BET_TOO_LARGE`, `INSUFFICIENT_BALANCE`, `GIFT_BETS_DISABLED`, `DUPLICATE_GIFT`, `INVALID_AMOUNT`, `INVALID_TEAM`, `USER_TOURNAMENT_BET_LIMIT`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The outcome of the bet is unknown: `BET_OUTCOME_UNKNOWN`. The bet may have been placed: check the Arena state before placing it again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-arena-bet",
+        "description": "Places an Arena bet on behalf of the key owner: GRAM from the balance or your gifts at their Arena valuation. The bet goes the same way as in the mini app: the same limits, fee and error codes. After a 504 or a network error, place the bet again only after checking the Arena state."
+      }
+    },
+    "/partners/arena/inventory": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "tags": [
+          "arena"
+        ],
+        "summary": "Own gifts with Arena valuation",
+        "parameters": [
+          {
+            "description": "Number of gifts per page, from 1 to 150, default 150.",
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Number of gifts to skip, for pagination.",
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Search by gift name.",
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by sale status: listed or unlisted.",
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Several sale statuses, comma-separated.",
+            "name": "statuses",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Collection short names, comma-separated.",
+            "name": "collection",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Sort order: price asc, price desc or listed_at desc.",
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/httptrustedapps.arenaInventoryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-arena-inventory",
+        "description": "The key owner's gifts with their Arena valuation, as in the Arena inventory of the mini app. The valuation is how much a gift counts in a bet."
+      }
+    },
+    "/partners/arena/state": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "tags": [
+          "arena"
+        ],
+        "summary": "Arena state: all rooms with the current game and its bets",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/httptrustedapps.arenaStateResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-arena-state",
+        "description": "All Arena rooms in one response: room settings and the current game with its bets in the order they were placed. Acts on behalf of the key owner: their bets are marked mine."
+      }
+    },
+    "/partners/collection-offers/": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Create an offer to buy NFTs from a specific collection. Funds will be frozen until offer is accepted or cancelled\nRequired fields: collection_id, amount, max_nfts (1..50).\nOffers with attributes return 403 while trait offers are disabled (mode read_only or off).",
+        "tags": [
+          "collection-offers"
+        ],
+        "summary": "Create a new collection offer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/httptrustedapps.CreateOfferRequest"
+              }
+            }
+          },
+          "description": "Collection offer details",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/httpcollectionoffer.CreateOfferResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-collection-offers"
+      }
+    },
+    "/partners/collection-offers/bulk/update": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Update up to 50 own collection offers in one request. Items are processed sequentially and independently: a failed item does not affect the others (partial success).\nRequired per item: id, amount (>= 0.5). Optional: max_nfts — remaining NFT slots (1..50, total with already bought must not exceed 50); omitted = keep current slots, no fee. Every slot increase charges the offer fee for the added slots.\nOptional expiration_days: 0 makes the offer indefinite, 1 or 7 resets expiration from now, omitted keeps the old expiration.\nBalance is checked per item against the remaining balance. Trait offers can be updated only while trait offers are enabled; such items fail individually otherwise.\nReturns 200 with per-item results; 422 if the request itself is malformed (empty list, more than 50 items, duplicate ids, invalid amount/max_nfts/expiration_days) — nothing is applied in that case.",
+        "tags": [
+          "collection-offers"
+        ],
+        "summary": "Bulk update collection offers",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/httptrustedapps.BulkUpdateOffersRequest"
+              }
+            }
+          },
+          "description": "Offers to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/collectionoffer.UpdateBatchOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-collection-offers-bulk-update"
+      }
+    },
+    "/partners/collection-offers/cancel": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Cancel your own collection offer and return frozen funds\nRequired fields: id.",
+        "tags": [
+          "collection-offers"
+        ],
+        "summary": "Cancel a collection offer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/httptrustedapps.CancelOfferRequest"
+              }
+            }
+          },
+          "description": "Collection offer ID",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-collection-offers-cancel"
+      }
+    },
+    "/partners/collection-offers/collections": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns list of collections that support collection offers",
+        "tags": [
+          "collection-offers"
+        ],
+        "summary": "Get collections available for offers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/collectionoffer.FetchCollectionsOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-collection-offers-collections"
+      }
+    },
+    "/partners/collection-offers/{collection_id}/all": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns top active offers for a collection, sorted by amount descending.",
+        "tags": [
+          "collection-offers"
+        ],
+        "summary": "Get top collection offers (up to 10)",
+        "parameters": [
+          {
+            "description": "Collection ID",
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Limit (default 10, max 10)",
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Offer scope filter",
+            "name": "scope",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "broad",
+                "trait"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/dtocollectionoffers.FetchTopOut"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-collection-offers-collection-id-all"
+      }
+    },
+    "/partners/collection-offers/{collection_id}/top": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns the highest active offer for a specific collection.",
+        "tags": [
+          "collection-offers"
+        ],
+        "summary": "Get top collection offer",
+        "parameters": [
+          {
+            "description": "Collection ID",
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Offer scope filter",
+            "name": "scope",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "broad",
+                "trait"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/dtocollectionoffers.CollectionOfferItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-collection-offers-collection-id-top"
+      }
+    },
+    "/partners/collection-offers/{offer_id}/accept": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Accept an offer by providing NFT IDs to sell. NFTs must belong to the offer's collection\nRequired fields: amount (must match the offer price), nft_ids (1..50 unique ids).",
+        "tags": [
+          "collection-offers"
+        ],
+        "summary": "Accept a collection offer",
+        "parameters": [
+          {
+            "description": "Collection Offer ID",
+            "name": "offer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/httptrustedapps.AcceptOfferRequest"
+              }
+            }
+          },
+          "description": "Accept offer request",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-collection-offers-offer-id-accept"
+      }
+    },
+    "/partners/collections/attribute-floors": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns floor prices for all unique model attributes across collections.",
+        "tags": [
+          "collection-filters"
+        ],
+        "summary": "Get all unique attribute floor prices",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/collection.FetchAllUniqueAttributeFloorsOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-collections-attribute-floors"
+      }
+    },
+    "/partners/collections/backdrops/floors": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns minimum listing prices grouped by backdrop type.",
+        "tags": [
+          "collection-filters"
+        ],
+        "summary": "Get floor prices for common backgrounds",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/collection.FetchBackgroundFloorPricesOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-collections-backdrops-floors"
+      }
+    },
+    "/partners/collections/floors": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns minimum listing prices for each collection.",
+        "tags": [
+          "collection-filters"
+        ],
+        "summary": "Get floor prices for all collections",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/collection.FetchBackgroundFloorPricesOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-collections-floors"
+      }
+    },
+    "/partners/collections/models/backgrounds/floors": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns minimum listing prices for backdrops of specified models.",
+        "tags": [
+          "collection-filters"
+        ],
+        "summary": "Get background floor prices for specific models",
+        "parameters": [
+          {
+            "description": "comma-separated list of model names",
+            "name": "models",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/collection.FetchModelsBackgroundsFloorPricesOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-collections-models-backgrounds-floors"
+      }
+    },
+    "/partners/collections/preview": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns all collections with preview images and basic info. No pagination",
+        "tags": [
+          "collections"
+        ],
+        "summary": "Get all collections with preview",
+        "parameters": [
+          {
+            "description": "sort field (name, floor_price)",
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "sort order (asc|desc)",
+            "name": "sort_order",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/collection.FetchAllCollectionsWithPreviewOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-collections-preview"
+      }
+    },
+    "/partners/collections/{collection_id}/metrics": {
+      "get": {
+        "description": "Returns historical data for a collection including volume and average prices.",
+        "tags": [
+          "collection"
+        ],
+        "summary": "Get collection metrics history",
+        "parameters": [
+          {
+            "description": "Collection ID (UUID format)",
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Start of the period, date-time in RFC 3339."
+          },
+          {
+            "name": "group_by",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Interval length for grouping the data: hour, day, week or month."
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "End of the period, date-time in RFC 3339; defaults to now."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/collection.FetchCollectionMetricsOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "operationId": "get-collections-collection-id-metrics"
+      }
+    },
+    "/partners/deposits": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Generate a unique deposit ID for TON deposits. Use this ID in transaction memo",
+        "tags": [
+          "deposit"
+        ],
+        "summary": "Generate deposit ID for user",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/userwallet.GenerateDepositIdOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-deposits"
+      }
+    },
+    "/partners/market/actions/": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns recent market actions (buys, sells, listings, etc.) with optional filters. sort_by=price asc is not supported and returns 422.",
+        "tags": [
+          "market"
+        ],
+        "summary": "Get market activity",
+        "parameters": [
+          {
+            "name": "action_types",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "sell",
+                  "buy",
+                  "lucky_buy",
+                  "offer",
+                  "listing",
+                  "price_update",
+                  "delist",
+                  "transfer",
+                  "cancel",
+                  "reject",
+                  "loot_pack",
+                  "loot_pack_take_gift",
+                  "loot_pack_gram",
+                  "loot_pack_payout"
+                ],
+                "type": "string"
+              }
+            },
+            "description": "Action types to return; by default the market feed."
+          },
+          {
+            "name": "collection_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Collection ID (UUID)."
+          },
+          {
+            "name": "collection_ids",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "List of collection IDs (UUID)."
+          },
+          {
+            "name": "external_collection_number",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Gift number within the collection."
+          },
+          {
+            "name": "filter_by_backdrops",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Backdrop names."
+          },
+          {
+            "name": "filter_by_models",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Model names; requires collection_id or collection_ids."
+          },
+          {
+            "name": "filter_by_symbols",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Symbol names."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 20
+            },
+            "description": "Number of actions per page."
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Maximum action amount in GRAM, decimal string."
+          },
+          {
+            "name": "min_price",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Minimum action amount in GRAM, decimal string."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 700,
+              "default": 0
+            },
+            "description": "Number of actions to skip, for pagination."
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "seven_days",
+                "fourteen_days",
+                "one_month"
+              ]
+            },
+            "description": "Return only actions within this recent period."
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "listed_at desc",
+                "price asc",
+                "price desc",
+                "external_collection_number asc",
+                "external_collection_number desc",
+                "model_rarity asc",
+                "model_rarity desc",
+                "created_at asc",
+                "created_at desc",
+                "id desc",
+                "id asc"
+              ]
+            },
+            "description": "Sort order; newest actions first by default."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "listed",
+                "unlisted"
+              ]
+            },
+            "description": "Filter by the gift's current sale status."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/usersactions.FetchAllUserActionsOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The feed is temporarily unavailable: `MARKET_FEED_UNAVAILABLE`. Retry the request later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-market-actions"
+      }
+    },
+    "/partners/market/config": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns market settings including commission rate, deposit wallet, and current TON/USDT rate",
+        "tags": [
+          "market"
+        ],
+        "summary": "Get market configuration",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/httptrustedapps.generalOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-market-config"
+      }
+    },
+    "/partners/nfts": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Attempts to purchase multiple NFTs. Returns detailed results including successful purchases and failed attempts with reasons. Supports partial purchases - if some NFTs are invalid or unaffordable, others will still be purchased.",
+        "tags": [
+          "nfts"
+        ],
+        "summary": "Buy NFTs with partial purchase support",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nft.BuyPartialIn"
+              }
+            }
+          },
+          "description": "body params"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nft.BuyPartialOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-nfts"
+      }
+    },
+    "/partners/nfts/bulk-list": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Put multiple NFTs on sale with individual prices in a single request",
+        "tags": [
+          "nfts"
+        ],
+        "summary": "Bulk list NFTs for sale",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nft.BulkListForSaleIn"
+              }
+            }
+          },
+          "description": "Array of NFT IDs with individual prices",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/dtonft.BulkListingResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-nfts-bulk-list"
+      }
+    },
+    "/partners/nfts/bulk-unlist": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Remove multiple NFTs from sale in a single request",
+        "tags": [
+          "nfts"
+        ],
+        "summary": "Bulk delist NFTs from sale",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nft.BulkDelistIn"
+              }
+            }
+          },
+          "description": "Array of NFT IDs to delist",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/dtonft.BulkListingResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-nfts-bulk-unlist"
+      }
+    },
+    "/partners/nfts/owned": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns NFTs owned by the authenticated user with optional filters.",
+        "tags": [
+          "nfts"
+        ],
+        "summary": "Get NFTs owned by user",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Collection ID (UUID)."
+          },
+          {
+            "name": "collection_ids",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "List of collection IDs (UUID); gifts from any of them are returned."
+          },
+          {
+            "name": "external_collection_number",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Gift number within the collection; numbers starting with these digits match."
+          },
+          {
+            "name": "filter_by_backdrops",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Backdrop names; gifts with any of them are returned."
+          },
+          {
+            "name": "filter_by_models",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Model names; gifts with any of them are returned."
+          },
+          {
+            "name": "filter_by_symbols",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Symbol names; gifts with any of them are returned."
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Gift IDs in Portals (UUID)."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of gifts per page."
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Maximum price in GRAM, decimal string; unlisted gifts are compared by their collection's floor price."
+          },
+          {
+            "name": "min_price",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Minimum price in GRAM, decimal string; unlisted gifts are compared by their collection's floor price."
+          },
+          {
+            "name": "mint_status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "minted",
+                "not_minted"
+              ]
+            },
+            "description": "Filter by whether the gift is minted on the TON blockchain."
+          },
+          {
+            "name": "name_filter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Part of the gift name, case-insensitive."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of gifts to skip, for pagination."
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by words of the gift name or by the beginning of the gift number."
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "listed_at desc",
+                "price asc",
+                "price desc",
+                "external_collection_number asc",
+                "external_collection_number desc",
+                "model_rarity asc",
+                "model_rarity desc",
+                "name asc",
+                "name desc"
+              ]
+            },
+            "description": "Sort order of the results."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "listed",
+                "unlisted"
+              ]
+            },
+            "description": "Filter by sale status; ignored when statuses is set."
+          },
+          {
+            "name": "statuses",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "List of gift statuses to return, repeated or comma-separated."
+          },
+          {
+            "name": "tg_ids",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Gift identifiers in Telegram, as in the tg_id field."
+          },
+          {
+            "name": "with_attributes",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Add attribute_floors to the response: floor prices for the models, backdrops and symbols of the returned gifts."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/httptrustedapps.fetchOwnedOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-nfts-owned"
+      }
+    },
+    "/partners/nfts/search": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Search NFTs with various filters - by name, price range, and attributes.",
+        "tags": [
+          "nfts"
+        ],
+        "summary": "Search NFTs by name with filters",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Collection ID (UUID)."
+          },
+          {
+            "name": "collection_ids",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "List of collection IDs (UUID); gifts from any of them are returned."
+          },
+          {
+            "name": "external_collection_number",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Gift number within the collection; numbers starting with these digits match."
+          },
+          {
+            "name": "filter_by_backdrops",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Backdrop names; gifts with any of them are returned."
+          },
+          {
+            "name": "filter_by_models",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Model names; gifts with any of them are returned."
+          },
+          {
+            "name": "filter_by_symbols",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Symbol names; gifts with any of them are returned."
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Gift IDs in Portals (UUID)."
+          },
+          {
+            "name": "is_owned",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "true returns only the user's own gifts, false excludes them."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of gifts per page."
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Maximum price in GRAM, decimal string; unlisted gifts are compared by their collection's floor price."
+          },
+          {
+            "name": "min_price",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Minimum price in GRAM, decimal string; unlisted gifts are compared by their collection's floor price."
+          },
+          {
+            "name": "mint_status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "minted",
+                "not_minted"
+              ]
+            },
+            "description": "Filter by whether the gift is minted on the TON blockchain."
+          },
+          {
+            "name": "name_filter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Part of the gift name, case-insensitive."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of gifts to skip, for pagination."
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by words of the gift name or by the beginning of the gift number."
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "listed_at desc",
+                "price asc",
+                "price desc",
+                "external_collection_number asc",
+                "external_collection_number desc",
+                "model_rarity asc",
+                "model_rarity desc",
+                "name asc",
+                "name desc"
+              ]
+            },
+            "description": "Sort order of the results."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "listed",
+                "unlisted"
+              ]
+            },
+            "description": "Filter by sale status; ignored when statuses is set."
+          },
+          {
+            "name": "statuses",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "List of gift statuses to return, repeated or comma-separated."
+          },
+          {
+            "name": "tg_ids",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Gift identifiers in Telegram, as in the tg_id field."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/httptrustedapps.searchNftsOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-nfts-search"
+      }
+    },
+    "/partners/nfts/stats": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns counts of total, listed, and unlisted NFTs for the authenticated user",
+        "tags": [
+          "nfts"
+        ],
+        "summary": "Get user NFT statistics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nft.FetchUserStatsOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-nfts-stats"
+      }
+    },
+    "/partners/nfts/transfer": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Transfer NFTs (gifts) from the current user to another user by username or telegram ID. Supports anonymous transfer (no notification sent)",
+        "tags": [
+          "nfts"
+        ],
+        "summary": "Transfer gifts to another user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nft.TransferGiftsIn"
+              }
+            }
+          },
+          "description": "Transfer gifts request",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Transfer result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nft.TransferGiftsOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recipient not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-nfts-transfer"
+      }
+    },
+    "/partners/nfts/withdraw": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Send NFT gifts to user's Telegram account. Returns withdrawal IDs to track status",
+        "tags": [
+          "nfts"
+        ],
+        "summary": "Withdraw multiple gifts to user account",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nft.WithdrawGiftsIn"
+              }
+            }
+          },
+          "description": "Withdraw gifts request",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nft.WithdrawGiftsOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-nfts-withdraw"
+      }
+    },
+    "/partners/nfts/withdrawals/statuses": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Check the status of pending or completed gift withdrawals",
+        "tags": [
+          "nfts"
+        ],
+        "summary": "Get withdrawal statuses",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Withdrawal IDs from the withdrawals_ids field of the withdraw response."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nft.WithdrawalStatusesOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-nfts-withdrawals-statuses"
+      }
+    },
+    "/partners/nfts/{nft_id}/list": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Put a single NFT on sale at the specified price",
+        "tags": [
+          "nfts"
+        ],
+        "summary": "List NFT for sale",
+        "parameters": [
+          {
+            "description": "NFT ID (UUID format)",
+            "name": "nft_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nft.ListForSaleIn"
+              }
+            }
+          },
+          "description": "Listing parameters including price"
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-nfts-nft-id-list"
+      }
+    },
+    "/partners/nfts/{nft_id}/unlist": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Remove a single NFT from sale",
+        "tags": [
+          "nfts"
+        ],
+        "summary": "Delist NFT from sale",
+        "parameters": [
+          {
+            "description": "NFT ID (UUID format)",
+            "name": "nft_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-nfts-nft-id-unlist"
+      }
+    },
+    "/partners/users/actions": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns actions of the authenticated partner user (purchases, sales, listings, etc.). Useful for tracking when gifts are sold.",
+        "tags": [
+          "market"
+        ],
+        "summary": "Get user actions",
+        "operationId": "get-users-actions",
+        "parameters": [
+          {
+            "name": "action_types",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "sell",
+                  "buy",
+                  "lucky_buy",
+                  "offer",
+                  "listing",
+                  "price_update",
+                  "delist",
+                  "transfer",
+                  "cancel",
+                  "reject",
+                  "loot_pack",
+                  "loot_pack_take_gift",
+                  "loot_pack_gram",
+                  "loot_pack_payout"
+                ],
+                "type": "string"
+              }
+            },
+            "description": "Action types to return, comma-separated; buy and sell both return all purchases involving the user."
+          },
+          {
+            "name": "collection_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Collection UUID to filter by."
+          },
+          {
+            "name": "collection_ids",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Collection UUIDs to filter by, comma-separated."
+          },
+          {
+            "name": "external_collection_number",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Gift number in the collection; matches numbers starting with these digits."
+          },
+          {
+            "name": "filter_by_backdrops",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Backdrop names to filter by, comma-separated."
+          },
+          {
+            "name": "filter_by_models",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Model names to filter by, comma-separated; requires collection_id or collection_ids."
+          },
+          {
+            "name": "filter_by_symbols",
+            "in": "query",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Symbol names to filter by, comma-separated."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 20
+            },
+            "description": "Number of actions per page."
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Maximum action amount in GRAM as a decimal string."
+          },
+          {
+            "name": "min_price",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Minimum action amount in GRAM as a decimal string."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 700,
+              "default": 0
+            },
+            "description": "Number of actions to skip for pagination."
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "seven_days",
+                "fourteen_days",
+                "one_month"
+              ]
+            },
+            "description": "Return only actions from the selected recent period."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "listed",
+                "unlisted"
+              ]
+            },
+            "description": "Current gift status to filter by."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/usersactions.FetchUserActionsOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/partners/users/wallets/": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Returns wallet balance and deposit address for the authenticated user",
+        "tags": [
+          "users_wallets"
+        ],
+        "summary": "Get user wallet info",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/userwallet.InfoOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-users-wallets"
+      }
+    },
+    "/partners/users/wallets/withdraw": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Withdraw TON balance to an external wallet address",
+        "tags": [
+          "users_wallets"
+        ],
+        "summary": "Withdraw TON from user wallet",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/userwallet.WithdrawIn"
+              }
+            }
+          },
+          "description": "Withdrawal details including amount and destination address",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/userwallet.WithdrawOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-users-wallets-withdraw"
+      }
+    },
+    "/partners/users/wallets/withdrawals/statuses": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Check the status of pending or completed TON withdrawals",
+        "tags": [
+          "users_wallets"
+        ],
+        "summary": "Get withdrawal statuses by IDs",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Withdrawal IDs (UUID) from the withdraw response, comma-separated."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/userwallet.WithdrawStatusOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-users-wallets-withdrawals-statuses"
+      }
+    },
+    "/partners/users/{user_id}": {
+      "get": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Checks if a user exists by provided Telegram ID.",
+        "tags": [
+          "users"
+        ],
+        "summary": "Check if user exists",
+        "parameters": [
+          {
+            "description": "Telegram ID of the user",
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User existence status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user.CheckExistenceOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Key missing or invalid. A key that does not exist or was reissued: `PARTNER_INVALID_KEY`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access to the API is closed. `PARTNER_KEY_DISABLED`: key disabled. `PARTNER_USER_BANNED`: account banned. `PARTNER_SUBSCRIPTION_REQUIRED`: no plan selected. `PARTNER_SUBSCRIPTION_EXPIRED`: subscription expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/exerr.HttpError"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-users-user-id"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://portal-market.com"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "example": "partners <your_key>",
+        "x-playground-example": "partners <your_key>"
+      }
+    },
+    "schemas": {
+      "collection.FetchAllCollectionsWithPreviewOut": {
+        "type": "object",
+        "properties": {
+          "collections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/model.CollectionWithPreview"
+            },
+            "description": "All collections with preview and basic market data."
+          }
+        }
+      },
+      "collection.FetchAllUniqueAttributeFloorsOut": {
+        "type": "object",
+        "required": [
+          "models",
+          "updated_at"
+        ],
+        "properties": {
+          "attribute_floors": {
+            "$ref": "#/components/schemas/dtocollectionfiltersrepo.FetchCollectionAttrFloorPricesOut",
+            "description": "Floor prices of models, backdrops and symbols per collection, keyed by collection short name in lowercase."
+          },
+          "models": {
+            "description": "Deprecated parameter do not use it instead of this use attribute_floors field",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/dtocollectionfiltersrepo.AttributeFloorInfo"
+            }
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Time the floor prices were calculated, date-time in RFC 3339."
+          }
+        }
+      },
+      "collection.FetchBackgroundFloorPricesOut": {
+        "type": "object",
+        "required": [
+          "floorPrices"
+        ],
+        "properties": {
+          "floorPrices": {
+            "$ref": "#/components/schemas/model.AttributeFloorPrices",
+            "description": "Floor prices in GRAM as decimal strings, keyed by collection short name or backdrop name depending on the method."
+          }
+        }
+      },
+      "collection.FetchCollectionMetricsOut": {
+        "type": "object",
+        "properties": {
+          "history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/model.CollectionMetrics"
+            },
+            "description": "Collection metrics per time interval, in chronological order."
+          }
+        }
+      },
+      "collection.FetchModelsBackgroundsFloorPricesOut": {
+        "type": "object",
+        "required": [
+          "model_backgrounds"
+        ],
+        "properties": {
+          "model_backgrounds": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/model.AttributeFloorPrices"
+            },
+            "description": "For each requested model name, floor prices of backdrops in its collection: backdrop name to price in GRAM as decimal string."
+          }
+        }
+      },
+      "collectionoffer.FetchCollectionsOut": {
+        "type": "object",
+        "properties": {
+          "collections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/model.Collection"
+            },
+            "description": "Collections you can place offers on."
+          },
+          "total_count": {
+            "type": "integer",
+            "description": "Number of collections in the list."
+          }
+        }
+      },
+      "collectionoffer.UpdateBatchFailedItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID of the offer that was not updated (UUID)."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Error text explaining why the offer was not updated."
+          }
+        }
+      },
+      "collectionoffer.UpdateBatchOut": {
+        "type": "object",
+        "properties": {
+          "failed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/collectionoffer.UpdateBatchFailedItem"
+            },
+            "description": "Offers that were not updated, with the reason for each."
+          },
+          "updated": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "IDs of successfully updated offers (UUID)."
+          }
+        }
+      },
+      "dtocollectionfiltersrepo.AttributeFloorInfo": {
+        "type": "object",
+        "required": [
+          "collection_name",
+          "floor_price",
+          "name"
+        ],
+        "properties": {
+          "collection_name": {
+            "type": "string",
+            "description": "Name of the collection the model belongs to."
+          },
+          "floor_price": {
+            "type": "string",
+            "description": "Floor price of the model in GRAM, decimal string."
+          },
+          "name": {
+            "type": "string",
+            "description": "Model name."
+          }
+        }
+      },
+      "dtocollectionfiltersrepo.FetchCollectionAttrFloorPricesOut": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "required": [
+            "backdrops",
+            "models",
+            "symbols"
+          ],
+          "properties": {
+            "backdrops": {
+              "$ref": "#/components/schemas/model.AttributeFloorPrices"
+            },
+            "models": {
+              "$ref": "#/components/schemas/model.AttributeFloorPrices"
+            },
+            "symbols": {
+              "$ref": "#/components/schemas/model.AttributeFloorPrices"
+            }
+          }
+        }
+      },
+      "dtocollectionoffers.CollectionInfo": {
+        "type": "object",
+        "properties": {
+          "floor_price": {
+            "type": "string",
+            "description": "Current floor price of the collection in GRAM, decimal string."
+          },
+          "name": {
+            "type": "string",
+            "description": "Collection name."
+          },
+          "photo_url": {
+            "type": "string",
+            "description": "URL of the collection image."
+          },
+          "short_name": {
+            "type": "string",
+            "description": "Short name of the collection (slug)."
+          }
+        }
+      },
+      "dtocollectionoffers.CollectionOfferItem": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Offer price per NFT in GRAM, decimal string."
+          },
+          "collection": {
+            "$ref": "#/components/schemas/dtocollectionoffers.CollectionInfo",
+            "description": "Basic info about the offer's collection."
+          },
+          "collection_id": {
+            "type": "string",
+            "description": "ID of the collection the offer is for (UUID)."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Offer creation time, date-time in RFC 3339."
+          },
+          "current_nfts": {
+            "type": "integer",
+            "description": "Number of NFTs already bought under the offer."
+          },
+          "expires_at": {
+            "type": "string",
+            "description": "Offer expiration time, date-time in RFC 3339; null if the offer has no expiration."
+          },
+          "id": {
+            "type": "string",
+            "description": "Offer ID (UUID)."
+          },
+          "max_nfts": {
+            "type": "integer",
+            "description": "Total number of NFTs the offer buys, including those already bought."
+          },
+          "scope": {
+            "$ref": "#/components/schemas/model.CollectionOfferScope",
+            "description": "Attribute filter of the offer; empty lists mean any NFT of the collection."
+          },
+          "sender_id": {
+            "type": "integer",
+            "description": "Telegram ID of the user who placed the offer."
+          },
+          "status": {
+            "type": "string",
+            "description": "Offer status: pending (active), completed (all NFTs bought) or canceled."
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Time of the last offer change, date-time in RFC 3339."
+          }
+        }
+      },
+      "dtocollectionoffers.FetchTopOut": {
+        "type": "object",
+        "properties": {
+          "offers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/dtocollectionoffers.CollectionOfferItem"
+            },
+            "description": "Active offers for the collection, sorted by price from highest to lowest."
+          },
+          "total_count": {
+            "type": "integer",
+            "description": "Total number of active offers for the collection that match the scope filter."
+          }
+        }
+      },
+      "dtonft.BulkListingResult": {
+        "type": "object",
+        "properties": {
+          "failed_nfts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/dtonft.FailedNft"
+            },
+            "description": "Gifts that were not processed, with reasons."
+          },
+          "successful_nfts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "IDs of gifts processed successfully."
+          }
+        }
+      },
+      "dtonft.FailedNft": {
+        "type": "object",
+        "properties": {
+          "nft_id": {
+            "type": "string",
+            "description": "Gift ID in Portals (UUID)."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Human-readable reason of the failure."
+          }
+        }
+      },
+      "dwithdrawalsrepo.FetchStatusByIdOut": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Withdrawal ID (UUID)."
+          },
+          "status": {
+            "$ref": "#/components/schemas/model.TonWithdrawalStatus",
+            "description": "Withdrawal status."
+          }
+        }
+      },
+      "exerr.HttpError": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Machine-readable error code, if any."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error description."
+          }
+        }
+      },
+      "httpcollectionoffer.CreateOfferAttribute": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "model",
+              "backdrop",
+              "symbol"
+            ],
+            "description": "Attribute type."
+          },
+          "value": {
+            "type": "string",
+            "description": "Attribute name exactly as in the collection, for example a model name."
+          }
+        }
+      },
+      "httpcollectionoffer.CreateOfferResponse": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Offer price per NFT in GRAM, decimal string."
+          },
+          "collection_id": {
+            "type": "string",
+            "description": "ID of the collection the offer is for (UUID)."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Offer creation time, date-time in RFC 3339."
+          },
+          "current_nfts": {
+            "type": "integer",
+            "description": "Number of NFTs already bought under the offer."
+          },
+          "expires_at": {
+            "type": "string",
+            "description": "Offer expiration time, date-time in RFC 3339; null if the offer has no expiration."
+          },
+          "id": {
+            "type": "string",
+            "description": "Offer ID (UUID)."
+          },
+          "max_nfts": {
+            "type": "integer",
+            "description": "Total number of NFTs the offer buys, including those already bought."
+          },
+          "scope": {
+            "$ref": "#/components/schemas/model.CollectionOfferScope",
+            "description": "Attribute filter of the offer; empty lists mean any NFT of the collection."
+          },
+          "sender_id": {
+            "type": "integer",
+            "description": "Telegram ID of the user who placed the offer."
+          },
+          "status": {
+            "type": "string",
+            "description": "Offer status: pending (active), completed (all NFTs bought) or canceled."
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Time of the last offer change, date-time in RFC 3339."
+          }
+        }
+      },
+      "httpmodel.Nft": {
+        "type": "object",
+        "required": [
+          "attributes",
+          "collection_id",
+          "external_collection_number",
+          "id",
+          "is_owned",
+          "name",
+          "photo_url",
+          "status"
+        ],
+        "properties": {
+          "animation_url": {
+            "type": "string",
+            "description": "URL of the gift animation, if there is one."
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/model.NftAttribute"
+            },
+            "description": "Gift attributes: model, backdrop and symbol with their rarity."
+          },
+          "collection_id": {
+            "type": "string",
+            "description": "ID of the gift's collection (UUID)."
+          },
+          "deposit_bonus": {
+            "$ref": "#/components/schemas/model.NftDepositBonus",
+            "description": "Your bonus for depositing this gift, only for your own gifts. Absent if the gift has no deposit bonus."
+          },
+          "emoji_id": {
+            "type": "string"
+          },
+          "external_collection_number": {
+            "type": "integer",
+            "description": "Gift number within its collection, as in Telegram."
+          },
+          "floor_price": {
+            "type": "string",
+            "description": "Floor price of the gift's collection: the lowest listing price in GRAM as a decimal string, 0 if nothing is listed."
+          },
+          "has_animation": {
+            "type": "boolean",
+            "description": "Whether the gift has an animation."
+          },
+          "id": {
+            "type": "string",
+            "description": "Gift ID in Portals (UUID)."
+          },
+          "import_source": {
+            "$ref": "#/components/schemas/model.NftImportSource",
+            "description": "Which Portals Telegram account received the gift when it was deposited."
+          },
+          "imported_at": {
+            "type": "string",
+            "description": "Date and time the gift was deposited to Portals, ISO 8601."
+          },
+          "is_owned": {
+            "type": "boolean",
+            "description": "Whether the gift belongs to the user of the API key."
+          },
+          "listed_at": {
+            "type": "string",
+            "description": "Date and time the gift was last listed for sale, ISO 8601."
+          },
+          "lucky_buy_eligible": {
+            "type": "boolean",
+            "description": "Whether the gift can currently be bought via Lucky Buy in the Portals app."
+          },
+          "name": {
+            "type": "string",
+            "description": "Gift name, the same as its collection name in Telegram."
+          },
+          "photo_url": {
+            "type": "string",
+            "description": "URL of the gift image."
+          },
+          "price": {
+            "type": "string",
+            "description": "Sale price in GRAM as a decimal string; set while the gift is listed for sale."
+          },
+          "status": {
+            "$ref": "#/components/schemas/model.NftStatus",
+            "description": "Current gift status in Portals."
+          },
+          "tg_id": {
+            "type": "string",
+            "description": "Gift identifier in Telegram: the gift slug or Telegram's owned-gift ID."
+          },
+          "ton_address": {
+            "type": "string",
+            "description": "Address of the gift NFT on the TON blockchain, if the gift is minted."
+          },
+          "unlocks_at": {
+            "type": "string",
+            "description": "Date and time until which Telegram does not allow transferring the gift, ISO 8601; before it the gift cannot be withdrawn or transferred."
+          }
+        }
+      },
+      "httptrustedapps.AcceptOfferRequest": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Offer price per NFT in GRAM, decimal string; must match the current offer price."
+          },
+          "nft_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "IDs of your NFTs from the offer's collection to sell into the offer, without duplicates."
+          }
+        }
+      },
+      "httptrustedapps.BulkUpdateOfferItem": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "New offer price per NFT in GRAM, decimal string."
+          },
+          "expiration_days": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              7
+            ],
+            "description": "New offer lifetime in days counted from now; 0 makes the offer indefinite; omit to keep the current expiration."
+          },
+          "id": {
+            "type": "string",
+            "description": "ID of your offer to update (UUID)."
+          },
+          "max_nfts": {
+            "type": "integer",
+            "maximum": 50,
+            "minimum": 1,
+            "description": "Number of NFTs still to buy, not counting those already bought; omit to keep the current value."
+          }
+        }
+      },
+      "httptrustedapps.BulkUpdateOffersRequest": {
+        "type": "object",
+        "properties": {
+          "offers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/httptrustedapps.BulkUpdateOfferItem"
+            },
+            "description": "Offers to update with their new parameters."
+          }
+        }
+      },
+      "httptrustedapps.CancelOfferRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID of your offer to cancel (UUID)."
+          }
+        }
+      },
+      "httptrustedapps.CreateOfferRequest": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Offer price per NFT in GRAM, decimal string."
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/httpcollectionoffer.CreateOfferAttribute"
+            },
+            "description": "Attribute filter: the offer buys only NFTs that match; values of the same type are alternatives; omit to buy any NFT of the collection."
+          },
+          "collection_id": {
+            "type": "string",
+            "description": "ID of the collection to buy NFTs from (UUID)."
+          },
+          "expiration_days": {
+            "type": "integer",
+            "description": "Offer lifetime in days: 1 or 7; omit for an offer without expiration."
+          },
+          "max_nfts": {
+            "type": "integer",
+            "maximum": 50,
+            "minimum": 1,
+            "description": "Number of NFTs the offer buys."
+          }
+        }
+      },
+      "httptrustedapps.arenaBet": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "example": "1.5",
+            "description": "Bet amount in GRAM, decimal string; for a gift — its Arena valuation."
+          },
+          "betType": {
+            "type": "string",
+            "enum": [
+              "ton",
+              "gift"
+            ],
+            "example": "ton",
+            "description": "Bet type: ton — GRAM, gift — a gift."
+          },
+          "createdAt": {
+            "type": "integer",
+            "example": 1761480001000,
+            "description": "Bet time, Unix milliseconds."
+          },
+          "mine": {
+            "type": "boolean",
+            "description": "true for bets of the key owner."
+          },
+          "playerId": {
+            "type": "string",
+            "description": "Public player ID: user:<Telegram ID>, or anon:<ID> for players in anonymous mode."
+          },
+          "playerName": {
+            "type": "string",
+            "description": "Player name as shown in the game."
+          }
+        }
+      },
+      "httptrustedapps.arenaBetRequest": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "description": "Bet amount in GRAM, decimal string; for bet_type ton.",
+            "type": "string",
+            "example": "1.5"
+          },
+          "bet_type": {
+            "type": "string",
+            "enum": [
+              "ton",
+              "gift"
+            ],
+            "example": "ton",
+            "description": "ton — bet GRAM from the balance, amount is required; gift — bet your gifts, gift_ids is required."
+          },
+          "gift_ids": {
+            "description": "IDs of your gifts from the Arena inventory, from 1 to 50; for bet_type gift. Each gift counts at its Arena valuation.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "room_id": {
+            "type": "integer",
+            "example": 1,
+            "description": "Room ID from the Arena state."
+          },
+          "team_id": {
+            "description": "Team ID; team rooms only.",
+            "type": "string",
+            "example": "1"
+          }
+        },
+        "example": {
+          "room_id": 1,
+          "bet_type": "ton",
+          "amount": "10"
+        }
+      },
+      "httptrustedapps.arenaBetResponse": {
+        "type": "object",
+        "properties": {
+          "acceptedAmount": {
+            "type": "string",
+            "example": "1.5",
+            "nullable": true,
+            "description": "Accepted amount in GRAM, decimal string; for gifts — the sum of their Arena valuations. null if it could not be read back; the bet is placed anyway."
+          },
+          "betId": {
+            "type": "string",
+            "description": "ID of the placed bet."
+          },
+          "gameId": {
+            "type": "integer",
+            "example": 12345,
+            "description": "ID of the game the bet went into."
+          },
+          "room": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/httptrustedapps.arenaRoom"
+              }
+            ],
+            "nullable": true,
+            "description": "Room state after the bet; null if it could not be read; the bet is placed anyway."
+          },
+          "serverTime": {
+            "type": "integer",
+            "example": 1761480000000,
+            "description": "Server time, Unix milliseconds."
+          }
+        }
+      },
+      "httptrustedapps.arenaGame": {
+        "type": "object",
+        "properties": {
+          "bets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/httptrustedapps.arenaBet"
+            },
+            "description": "Bets of the game in the order they were placed."
+          },
+          "countdownEndsAt": {
+            "type": "integer",
+            "example": 1761480030000,
+            "description": "End of the countdown, Unix milliseconds; only in countdown. Bets close 1 second before it."
+          },
+          "id": {
+            "type": "integer",
+            "example": 12345,
+            "description": "Game ID."
+          },
+          "playerCount": {
+            "type": "integer",
+            "example": 3,
+            "description": "Number of players in the game."
+          },
+          "prizePool": {
+            "type": "string",
+            "example": "12.5",
+            "description": "Pot in GRAM, decimal string: all bets, gifts at their Arena valuation."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "idle",
+              "countdown",
+              "preparing",
+              "active",
+              "settling",
+              "completed"
+            ],
+            "example": "countdown",
+            "description": "Game status. Bets are accepted in idle (waiting for players) and countdown; preparing, active, settling and completed — the round is being played or settled."
+          }
+        }
+      },
+      "httptrustedapps.arenaInventoryAttr": {
+        "type": "object",
+        "properties": {
+          "floor": {
+            "type": "string",
+            "description": "Floor price of gifts with this attribute in GRAM, decimal string."
+          },
+          "rarityPerMille": {
+            "type": "number",
+            "description": "Attribute rarity in percent: the share of gifts in the collection with this value."
+          },
+          "type": {
+            "type": "string",
+            "description": "Attribute kind: model, backdrop or symbol."
+          },
+          "value": {
+            "type": "string",
+            "description": "Attribute name, for example the model name."
+          }
+        }
+      },
+      "httptrustedapps.arenaInventoryItem": {
+        "type": "object",
+        "properties": {
+          "animationUrl": {
+            "type": "string",
+            "description": "URL of the gift animation, if there is one."
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/httptrustedapps.arenaInventoryAttr"
+            },
+            "description": "Gift attributes: model, backdrop and symbol with their rarity."
+          },
+          "collection": {
+            "type": "string",
+            "description": "Collection name."
+          },
+          "collectionId": {
+            "type": "string",
+            "description": "ID of the gift's collection (UUID)."
+          },
+          "externalCollectionNumber": {
+            "type": "integer",
+            "description": "Gift number within its collection, as in Telegram."
+          },
+          "floorPrice": {
+            "type": "string",
+            "description": "Floor price of the gift's collection in GRAM, decimal string."
+          },
+          "hasAnimation": {
+            "type": "boolean",
+            "description": "Whether the gift has an animation."
+          },
+          "id": {
+            "type": "string",
+            "description": "Gift ID in Portals (UUID); pass it in gift_ids."
+          },
+          "importSource": {
+            "type": "string",
+            "description": "Which Portals Telegram account received the gift when it was deposited."
+          },
+          "name": {
+            "type": "string",
+            "example": "Plush Pepe",
+            "description": "Gift name, the same as its collection name in Telegram."
+          },
+          "photoUrl": {
+            "type": "string",
+            "description": "URL of the gift image."
+          },
+          "price": {
+            "type": "string",
+            "example": "3.2",
+            "description": "Arena valuation in GRAM, decimal string: the gift counts this much in a bet. 0 if the valuation is unavailable; such a gift cannot be bet."
+          },
+          "status": {
+            "type": "string",
+            "description": "Sale status: listed — on sale on the market, unlisted — not on sale."
+          },
+          "tgId": {
+            "type": "string",
+            "description": "Gift identifier in Telegram: the gift slug or Telegram's owned-gift ID."
+          }
+        }
+      },
+      "httptrustedapps.arenaInventoryResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/httptrustedapps.arenaInventoryItem"
+            },
+            "description": "Your gifts on the page."
+          },
+          "totalCount": {
+            "type": "integer",
+            "example": 42,
+            "description": "Number of your gifts matching the filters, for pagination."
+          }
+        }
+      },
+      "httptrustedapps.arenaRoom": {
+        "type": "object",
+        "properties": {
+          "allowGiftBets": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether gift bets are allowed in the room."
+          },
+          "countdownDurationSeconds": {
+            "type": "integer",
+            "example": 30,
+            "description": "Countdown length in seconds. The countdown starts when a second player bets."
+          },
+          "game": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/httptrustedapps.arenaGame"
+              }
+            ],
+            "nullable": true,
+            "description": "Current game of the room; null if there is none."
+          },
+          "maxBetAmount": {
+            "type": "string",
+            "example": "1000",
+            "description": "Maximum in GRAM, decimal string, for a single bet and for the sum of your bets in one game."
+          },
+          "maxPlayersCount": {
+            "type": "integer",
+            "example": 50,
+            "description": "Maximum number of players in one game."
+          },
+          "minBetAmount": {
+            "type": "string",
+            "example": "0.1",
+            "description": "Minimum single bet in GRAM, decimal string."
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "classic",
+              "team"
+            ],
+            "example": "classic",
+            "description": "Room mode: classic or team."
+          },
+          "roomId": {
+            "type": "integer",
+            "example": 1,
+            "description": "Room ID; pass it as room_id when betting."
+          }
+        }
+      },
+      "httptrustedapps.arenaStateResponse": {
+        "type": "object",
+        "properties": {
+          "rooms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/httptrustedapps.arenaRoom"
+            },
+            "description": "Arena rooms, each with its current game."
+          },
+          "serverTime": {
+            "type": "integer",
+            "example": 1761480000000,
+            "description": "Server time, Unix milliseconds. Count the countdown against it, not against your clock."
+          }
+        }
+      },
+      "httptrustedapps.fetchOwnedOut": {
+        "type": "object",
+        "required": [
+          "nfts"
+        ],
+        "properties": {
+          "attribute_floors": {
+            "$ref": "#/components/schemas/nft.AttributeFloorsMap",
+            "description": "Floor prices in GRAM for the models, backdrops and symbols of the returned gifts; present when with_attributes=true."
+          },
+          "nfts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/httpmodel.Nft"
+            },
+            "description": "User's gifts on the requested page."
+          },
+          "total_count": {
+            "type": "integer",
+            "description": "Total number of the user's gifts matching the filters, for pagination."
+          }
+        }
+      },
+      "httptrustedapps.generalOut": {
+        "type": "object",
+        "required": [
+          "commission",
+          "cooldown",
+          "deposit_wallet",
+          "rub_course",
+          "usd_course",
+          "user_cashback"
+        ],
+        "properties": {
+          "commission": {
+            "type": "string",
+            "description": "Base market commission as a fraction of the sale price, decimal string; deducted from the seller's proceeds."
+          },
+          "cooldown": {
+            "type": "string"
+          },
+          "deposit_wallet": {
+            "type": "string",
+            "description": "TON wallet address for depositing GRAM to the Portals balance."
+          },
+          "rub_course": {
+            "type": "string",
+            "description": "Price of 1 GRAM in rubles, decimal string."
+          },
+          "usd_course": {
+            "type": "string",
+            "description": "Price of 1 GRAM in US dollars, decimal string."
+          },
+          "user_cashback": {
+            "type": "string",
+            "description": "Share of the market commission returned to the user as cashback on purchases, decimal string."
+          }
+        }
+      },
+      "httptrustedapps.searchNftsOut": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/httpmodel.Nft"
+            },
+            "description": "Gifts on the requested page."
+          },
+          "total_count": {
+            "type": "integer",
+            "description": "Total number of gifts matching the filters, for pagination."
+          }
+        }
+      },
+      "model.AnonymizedUserAction": {
+        "type": "object",
+        "required": [
+          "created_at",
+          "type"
+        ],
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Action amount in GRAM as a decimal string: purchase price, listing price or offer amount."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "When the action happened, date-time in RFC 3339."
+          },
+          "nft": {
+            "$ref": "#/components/schemas/model.UserActionNft",
+            "description": "Gift (NFT) the action relates to."
+          },
+          "offer_id": {
+            "type": "string",
+            "description": "Offer UUID for offer-related actions."
+          },
+          "old_price": {
+            "type": "string",
+            "description": "Previous listing price in GRAM as a decimal string, for price updates."
+          },
+          "type": {
+            "$ref": "#/components/schemas/model.UserActionType",
+            "description": "Action type."
+          }
+        }
+      },
+      "model.AttributeFloorPrices": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "model.Collection": {
+        "type": "object",
+        "required": [
+          "name",
+          "photo_url"
+        ],
+        "properties": {
+          "cashback_percent": {
+            "type": "string",
+            "description": "Promotional cashback for buyers in this collection, as a percentage of the market commission; absent if there is no promotion."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Time the collection was added to Portals, date-time in RFC 3339."
+          },
+          "day_volume": {
+            "type": "string",
+            "description": "Trading volume of the collection over the last 24 hours in GRAM, decimal string."
+          },
+          "floor_price": {
+            "type": "string",
+            "description": "Current floor price of the collection in GRAM, decimal string."
+          },
+          "id": {
+            "type": "string",
+            "description": "Collection ID (UUID)."
+          },
+          "is_new": {
+            "type": "boolean",
+            "description": "Whether the collection is marked as new."
+          },
+          "market_cap": {
+            "type": "string",
+            "description": "Market capitalization: supply multiplied by the floor price, in GRAM, decimal string."
+          },
+          "name": {
+            "type": "string",
+            "description": "Collection name."
+          },
+          "photo_url": {
+            "type": "string",
+            "description": "URL of the collection image."
+          },
+          "points_multiplier": {
+            "type": "string",
+            "description": "Promotional multiplier of season points for this collection; absent if there is no promotion."
+          },
+          "short_name": {
+            "type": "string",
+            "description": "Short name of the collection (slug)."
+          },
+          "supply": {
+            "type": "integer",
+            "description": "Number of NFTs in the collection."
+          },
+          "zero_commission": {
+            "type": "boolean",
+            "description": "Whether trades in this collection have no market commission."
+          }
+        }
+      },
+      "model.CollectionAsset": {
+        "type": "object",
+        "required": [
+          "name",
+          "url"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Attribute name, for example a model name."
+          },
+          "rarity_per_mille": {
+            "type": "number"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL of the attribute image; may be empty."
+          }
+        }
+      },
+      "model.CollectionMetrics": {
+        "type": "object",
+        "required": [
+          "avg_price",
+          "collection_id",
+          "total_volume"
+        ],
+        "properties": {
+          "avg_price": {
+            "type": "string",
+            "description": "Average sale price over the interval in GRAM, decimal string."
+          },
+          "collection_id": {
+            "type": "string",
+            "description": "Collection ID (UUID)."
+          },
+          "floor_price": {
+            "type": "string",
+            "description": "Floor price of the collection at the end of the interval in GRAM, decimal string."
+          },
+          "interval_time": {
+            "type": "string",
+            "description": "End of the interval, date-time in RFC 3339."
+          },
+          "total_volume": {
+            "type": "string",
+            "description": "Sales volume over the interval in GRAM, decimal string."
+          }
+        }
+      },
+      "model.CollectionOfferScope": {
+        "type": "object",
+        "properties": {
+          "backdrops": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Backdrop names the NFT may have; empty means any backdrop."
+          },
+          "models": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Model names the NFT may have; empty means any model."
+          },
+          "symbols": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Symbol names the NFT may have; empty means any symbol."
+          }
+        }
+      },
+      "model.CollectionWithPreview": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "cashback_percent": {
+            "type": "string",
+            "description": "Promotional cashback for buyers in this collection, as a percentage of the market commission; absent if there is no promotion."
+          },
+          "day_volume": {
+            "type": "string",
+            "description": "Trading volume of the collection over the last 24 hours in GRAM, decimal string."
+          },
+          "floor_price": {
+            "type": "string",
+            "description": "Current floor price of the collection in GRAM, decimal string."
+          },
+          "id": {
+            "type": "string",
+            "description": "Collection ID (UUID)."
+          },
+          "is_new": {
+            "type": "boolean",
+            "description": "Whether the collection is marked as new."
+          },
+          "name": {
+            "type": "string",
+            "description": "Collection name."
+          },
+          "photo_url": {
+            "type": "string",
+            "description": "URL of the collection image."
+          },
+          "points_multiplier": {
+            "type": "string",
+            "description": "Promotional multiplier of season points for this collection; absent if there is no promotion."
+          },
+          "preview": {
+            "$ref": "#/components/schemas/model.CollectionAsset",
+            "description": "Preview attribute of the collection: its rarest model; only the name is filled."
+          },
+          "short_name": {
+            "type": "string",
+            "description": "Short name of the collection (slug)."
+          },
+          "supply": {
+            "type": "string",
+            "description": "Number of NFTs in the collection, as a string."
+          },
+          "zero_commission": {
+            "type": "boolean",
+            "description": "Whether trades in this collection have no market commission."
+          }
+        }
+      },
+      "model.DepositBonusClaimStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "claimable",
+          "paid",
+          "forfeited"
+        ],
+        "x-enum-varnames": [
+          "DepositBonusClaimPending",
+          "DepositBonusClaimClaimable",
+          "DepositBonusClaimPaid",
+          "DepositBonusClaimForfeited"
+        ]
+      },
+      "model.DetailedUserAction": {
+        "type": "object",
+        "required": [
+          "collection_id",
+          "type"
+        ],
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Action amount in GRAM as a decimal string: purchase price, listing price or offer amount."
+          },
+          "collection": {
+            "$ref": "#/components/schemas/model.UserActionCollectionOffer",
+            "description": "Collection of the gift: ID, name, image and floor price."
+          },
+          "collection_id": {
+            "type": "string",
+            "description": "Collection UUID."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "When the action happened, date-time in RFC 3339."
+          },
+          "initiator_user_id": {
+            "type": "integer",
+            "description": "Telegram ID of the user who performed the action, e.g. the buyer or the sender of a transfer."
+          },
+          "max_nfts": {
+            "type": "integer",
+            "description": "For collection offers, the maximum number of gifts the offer covers."
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "Additional action data; the set of keys depends on the action type."
+          },
+          "nft": {
+            "$ref": "#/components/schemas/model.UserActionNft",
+            "description": "Gift (NFT) the action relates to."
+          },
+          "nft_id": {
+            "type": "string",
+            "description": "ID of the gift (NFT) the action relates to."
+          },
+          "offer": {
+            "$ref": "#/components/schemas/model.UserActionOffer",
+            "description": "Offer details for offer-related actions."
+          },
+          "old_price": {
+            "type": "string",
+            "description": "Previous listing price in GRAM as a decimal string, for price updates."
+          },
+          "target_user_id": {
+            "type": "integer",
+            "description": "Telegram ID of the other party, e.g. the seller or the recipient of a transfer."
+          },
+          "type": {
+            "$ref": "#/components/schemas/model.UserActionType",
+            "description": "Action type."
+          }
+        }
+      },
+      "model.Nft": {
+        "type": "object",
+        "required": [
+          "attributes",
+          "collection_id",
+          "external_collection_number",
+          "id",
+          "name",
+          "photo_url",
+          "status"
+        ],
+        "properties": {
+          "animation_url": {
+            "type": "string",
+            "description": "URL of the gift animation, if there is one."
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/model.NftAttribute"
+            },
+            "description": "Gift attributes: model, backdrop and symbol with their rarity."
+          },
+          "collection_id": {
+            "type": "string",
+            "description": "ID of the gift's collection (UUID)."
+          },
+          "deposit_bonus": {
+            "$ref": "#/components/schemas/model.NftDepositBonus",
+            "description": "Your bonus for depositing this gift, only for your own gifts. Absent if the gift has no deposit bonus."
+          },
+          "emoji_id": {
+            "type": "string"
+          },
+          "external_collection_number": {
+            "type": "integer",
+            "description": "Gift number within its collection, as in Telegram."
+          },
+          "floor_price": {
+            "type": "string",
+            "description": "Floor price of the gift's collection: the lowest listing price in GRAM as a decimal string, 0 if nothing is listed."
+          },
+          "has_animation": {
+            "type": "boolean",
+            "description": "Whether the gift has an animation."
+          },
+          "id": {
+            "type": "string",
+            "description": "Gift ID in Portals (UUID)."
+          },
+          "import_source": {
+            "$ref": "#/components/schemas/model.NftImportSource",
+            "description": "Which Portals Telegram account received the gift when it was deposited."
+          },
+          "imported_at": {
+            "type": "string",
+            "description": "Date and time the gift was deposited to Portals, ISO 8601."
+          },
+          "listed_at": {
+            "type": "string",
+            "description": "Date and time the gift was last listed for sale, ISO 8601."
+          },
+          "lucky_buy_eligible": {
+            "type": "boolean",
+            "description": "Whether the gift can currently be bought via Lucky Buy in the Portals app."
+          },
+          "name": {
+            "type": "string",
+            "description": "Gift name, the same as its collection name in Telegram."
+          },
+          "photo_url": {
+            "type": "string",
+            "description": "URL of the gift image."
+          },
+          "price": {
+            "type": "string",
+            "description": "Sale price in GRAM as a decimal string; set while the gift is listed for sale."
+          },
+          "status": {
+            "$ref": "#/components/schemas/model.NftStatus",
+            "description": "Current gift status in Portals."
+          },
+          "tg_id": {
+            "type": "string",
+            "description": "Gift identifier in Telegram: the gift slug or Telegram's owned-gift ID."
+          },
+          "ton_address": {
+            "type": "string",
+            "description": "Address of the gift NFT on the TON blockchain, if the gift is minted."
+          },
+          "unlocks_at": {
+            "type": "string",
+            "description": "Date and time until which Telegram does not allow transferring the gift, ISO 8601; before it the gift cannot be withdrawn or transferred."
+          }
+        }
+      },
+      "model.NftAttribute": {
+        "type": "object",
+        "required": [
+          "rarity_per_mille",
+          "type",
+          "value"
+        ],
+        "properties": {
+          "rarity_per_mille": {
+            "type": "number",
+            "description": "Attribute rarity in percent: the share of gifts in the collection with this value."
+          },
+          "type": {
+            "enum": [
+              "model",
+              "backdrop",
+              "symbol"
+            ],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/model.NftAttributeType"
+              }
+            ],
+            "description": "Attribute kind."
+          },
+          "value": {
+            "type": "string",
+            "description": "Attribute name, for example the model name."
+          }
+        }
+      },
+      "model.NftAttributeType": {
+        "type": "string",
+        "enum": [
+          "model",
+          "backdrop",
+          "symbol"
+        ],
+        "x-enum-varnames": [
+          "NftAttributeTypeModel",
+          "NftAttributeTypeBackdrop",
+          "NftAttributeTypeSymbol"
+        ]
+      },
+      "model.NftDepositBonus": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Bonus amount in GRAM, decimal string."
+          },
+          "eligible_at": {
+            "type": "string",
+            "description": "Time from which the bonus can be claimed if the gift is still yours and on the market, date-time in RFC 3339."
+          },
+          "status": {
+            "$ref": "#/components/schemas/model.DepositBonusClaimStatus",
+            "description": "Bonus status: pending — waiting for eligible_at; claimable — can be claimed in the mini app; paid — paid out; forfeited — lost because the gift did not stay yours on the market until eligible_at."
+          }
+        }
+      },
+      "model.NftImportSource": {
+        "type": "string",
+        "enum": [
+          "bot",
+          "user_bot"
+        ],
+        "x-enum-varnames": [
+          "NftImportSourceBot",
+          "NftImportSourceUserBot"
+        ]
+      },
+      "model.NftStatus": {
+        "type": "string",
+        "enum": [
+          "listed",
+          "unlisted",
+          "withdrawn",
+          "auction",
+          "deleted"
+        ],
+        "x-enum-varnames": [
+          "NftListedStatus",
+          "NftUnlistedStatus",
+          "NftWithdrawnStatus",
+          "NftAuctionStatus",
+          "NftDeletedStatus"
+        ]
+      },
+      "model.TonWithdrawalStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "in_progress",
+          "resolved"
+        ],
+        "x-enum-varnames": [
+          "TonWithdrawalStatusPending",
+          "TonWithdrawalStatusInProgress",
+          "TonWithdrawalStatusResolved"
+        ]
+      },
+      "model.User": {
+        "type": "object",
+        "required": [
+          "is_influencer",
+          "referral_level"
+        ],
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "description": "First name from the Telegram profile."
+          },
+          "is_banned": {
+            "type": "boolean",
+            "description": "Whether the user is blocked on the market."
+          },
+          "is_influencer": {
+            "type": "boolean"
+          },
+          "is_premium": {
+            "type": "boolean",
+            "description": "Whether the user has Telegram Premium."
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Last name from the Telegram profile."
+          },
+          "name": {
+            "type": "string"
+          },
+          "photo_url": {
+            "type": "string",
+            "description": "URL of the user's avatar."
+          },
+          "referral_level": {
+            "type": "integer",
+            "description": "User's level in the referral program."
+          },
+          "referrer_id": {
+            "type": "integer",
+            "description": "Telegram ID of the user who invited this user, if any."
+          },
+          "username": {
+            "type": "string",
+            "description": "Telegram username without the @."
+          }
+        }
+      },
+      "model.UserActionCollectionOffer": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "photo_url",
+          "short_name"
+        ],
+        "properties": {
+          "floor_price": {
+            "type": "string",
+            "description": "Current floor price of the collection in GRAM, decimal string; may be absent."
+          },
+          "id": {
+            "type": "string",
+            "description": "ID of the offer's collection (UUID)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Collection name."
+          },
+          "photo_url": {
+            "type": "string",
+            "description": "URL of the collection image."
+          },
+          "short_name": {
+            "type": "string",
+            "description": "Short name of the collection (slug)."
+          }
+        }
+      },
+      "model.UserActionNft": {
+        "type": "object",
+        "required": [
+          "collection_id",
+          "external_collection_number",
+          "id",
+          "is_owned",
+          "name",
+          "photo_url"
+        ],
+        "properties": {
+          "animation_url": {
+            "type": "string",
+            "description": "URL of the gift animation."
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/model.NftAttribute"
+            },
+            "description": "Gift attributes: model, backdrop and symbol with their rarity."
+          },
+          "collection_id": {
+            "type": "string",
+            "description": "Collection UUID."
+          },
+          "emoji_id": {
+            "type": "string",
+            "description": "Telegram custom emoji ID of the gift."
+          },
+          "external_collection_number": {
+            "type": "integer",
+            "description": "Gift number within the collection, as in Telegram."
+          },
+          "floor_price": {
+            "type": "string",
+            "description": "Current floor price of the collection in GRAM as a decimal string."
+          },
+          "has_animation": {
+            "type": "boolean",
+            "description": "Whether the gift has an animation."
+          },
+          "id": {
+            "type": "string",
+            "description": "Gift (NFT) ID in Portals."
+          },
+          "is_owned": {
+            "type": "boolean",
+            "description": "Whether the gift currently belongs to the authenticated user."
+          },
+          "name": {
+            "type": "string",
+            "description": "Gift name."
+          },
+          "photo_url": {
+            "type": "string",
+            "description": "URL of the gift image."
+          },
+          "price": {
+            "type": "string",
+            "description": "Current listing price in GRAM as a decimal string."
+          },
+          "status": {
+            "type": "string",
+            "description": "Current gift status, e.g. listed (for sale) or unlisted."
+          },
+          "ton_address": {
+            "type": "string",
+            "description": "Gift address on the TON blockchain if it has been minted."
+          },
+          "unlocks_at": {
+            "type": "string",
+            "description": "Date-time in RFC 3339 when the gift can be transferred in Telegram again."
+          }
+        }
+      },
+      "model.UserActionOffer": {
+        "type": "object",
+        "required": [
+          "price",
+          "status"
+        ],
+        "properties": {
+          "price": {
+            "type": "string",
+            "description": "Offer amount in GRAM as a decimal string."
+          },
+          "recipient_id": {
+            "type": "integer",
+            "description": "Telegram ID of the gift owner who received the offer."
+          },
+          "sender_id": {
+            "type": "integer",
+            "description": "Telegram ID of the user who made the offer."
+          },
+          "status": {
+            "type": "string",
+            "description": "Offer status: pending, accepted, rejected or canceled."
+          }
+        }
+      },
+      "model.UserActionType": {
+        "type": "string",
+        "enum": [
+          "purchase",
+          "offer",
+          "collection_offer",
+          "listing",
+          "price_update",
+          "delist",
+          "reject",
+          "cancel",
+          "transfer",
+          "lucky_buy_win",
+          "lucky_buy_loss",
+          "loot_pack_gram",
+          "loot_pack_payout",
+          "loot_pack_take_gift"
+        ],
+        "x-enum-varnames": [
+          "UserActionTypePurchase",
+          "UserActionOfferType",
+          "UserActionCollectionOfferType",
+          "UserActionListingType",
+          "UserActionPriceUpdateType",
+          "UserActionDelistType",
+          "UserActionRejectType",
+          "UserActionCancelType",
+          "UserActionTransferType",
+          "UserActionLuckyBuyWinType",
+          "UserActionLuckyBuyLossType",
+          "UserActionLootPackGramType",
+          "UserActionLootPackPayoutType",
+          "UserActionLootPackTakeGiftType"
+        ]
+      },
+      "nft.AttributeFloorsMap": {
+        "type": "object",
+        "required": [
+          "backdrops",
+          "models",
+          "symbols"
+        ],
+        "properties": {
+          "backdrops": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Floor prices of the backdrops of the returned NFTs: backdrop name to price in GRAM as decimal string."
+          },
+          "models": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Floor prices of the models of the returned NFTs: model name to price in GRAM as decimal string."
+          },
+          "symbols": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Floor prices of the symbols of the returned NFTs: symbol name to price in GRAM as decimal string."
+          }
+        }
+      },
+      "nft.BulkDelistIn": {
+        "type": "object",
+        "required": [
+          "nft_ids"
+        ],
+        "properties": {
+          "nft_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "IDs of gifts to remove from sale (UUID)."
+          }
+        }
+      },
+      "nft.BulkListForSaleIn": {
+        "type": "object",
+        "properties": {
+          "nft_prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nft.NftPriceDetail"
+            },
+            "description": "Gifts to list for sale, each with its own price."
+          }
+        }
+      },
+      "nft.BuyDetail": {
+        "type": "object",
+        "required": [
+          "id",
+          "price"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Gift ID in Portals (UUID)."
+          },
+          "price": {
+            "type": "string",
+            "description": "Expected price in GRAM as a decimal string; must match the current listing price, otherwise the gift is not bought."
+          }
+        }
+      },
+      "nft.BuyPartialIn": {
+        "type": "object",
+        "required": [
+          "nft_details"
+        ],
+        "properties": {
+          "nft_details": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nft.BuyDetail"
+            },
+            "description": "Gifts to buy, each with the price the buyer expects to pay."
+          }
+        }
+      },
+      "nft.BuyPartialOut": {
+        "type": "object",
+        "properties": {
+          "invalid_nfts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nft.InvalidNftDetail"
+            },
+            "description": "Gifts that failed the availability check before purchase."
+          },
+          "purchase_results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nft.PurchaseResult"
+            },
+            "description": "Result for each requested gift."
+          },
+          "total_failed": {
+            "type": "integer",
+            "description": "Number of gifts that were not bought."
+          },
+          "total_purchased": {
+            "type": "integer",
+            "description": "Number of gifts bought."
+          },
+          "total_requested": {
+            "type": "integer",
+            "description": "Number of gifts in the request."
+          },
+          "total_spent": {
+            "type": "string",
+            "description": "Total amount spent in GRAM, decimal string."
+          },
+          "updated_nfts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nft.UpdatedNftDetail"
+            },
+            "description": "Gifts whose price differs from the one in the request."
+          }
+        }
+      },
+      "nft.FetchUserStatsOut": {
+        "type": "object",
+        "required": [
+          "listed_count",
+          "unlisted_count"
+        ],
+        "properties": {
+          "listed_count": {
+            "type": "integer",
+            "description": "Number of the user's gifts listed for sale."
+          },
+          "unlisted_count": {
+            "type": "integer",
+            "description": "Number of the user's gifts not listed for sale."
+          }
+        }
+      },
+      "nft.InvalidNftDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Gift ID in Portals (UUID)."
+          },
+          "nft": {
+            "$ref": "#/components/schemas/model.Nft",
+            "description": "Gift data at the time of the check."
+          },
+          "reason": {
+            "$ref": "#/components/schemas/nft.InvalidNftReason",
+            "description": "Why the gift cannot be bought."
+          }
+        }
+      },
+      "nft.InvalidNftReason": {
+        "type": "string",
+        "enum": [
+          "NFT_NOT_FOUND",
+          "NFT_NOT_LISTED",
+          "OWNER_CHANGED",
+          "PRICE_CHANGED",
+          "SELF_PURCHASE",
+          "DUPLICATE_NFT",
+          "NFT_NOT_IMPORTED",
+          "NFT_NOT_AVAILABLE"
+        ],
+        "x-enum-comments": {
+          "InvalidNftDuplicate": "Duplicate NFT ID in request",
+          "InvalidNftNotFound": "NFT not found in the database",
+          "InvalidNftNotImported": "NFT not imported to Telegram",
+          "InvalidNftNotListed": "NFT is not listed for sale",
+          "InvalidNftOwnerChanged": "NFT owner has changed",
+          "InvalidNftPriceChanged": "NFT price has changed",
+          "InvalidNftSelfPurchase": "Attempt to purchase own NFT"
+        },
+        "x-enum-varnames": [
+          "InvalidNftNotFound",
+          "InvalidNftNotListed",
+          "InvalidNftOwnerChanged",
+          "InvalidNftPriceChanged",
+          "InvalidNftSelfPurchase",
+          "InvalidNftDuplicate",
+          "InvalidNftNotImported",
+          "InvalidNftNotAvailable"
+        ]
+      },
+      "nft.ListForSaleIn": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "string",
+            "description": "Sale price in GRAM as a decimal string."
+          }
+        }
+      },
+      "nft.NftPriceDetail": {
+        "type": "object",
+        "required": [
+          "nft_id"
+        ],
+        "properties": {
+          "nft_id": {
+            "type": "string",
+            "description": "Gift ID in Portals (UUID)."
+          },
+          "price": {
+            "type": "string",
+            "description": "Sale price in GRAM as a decimal string."
+          }
+        }
+      },
+      "nft.PurchaseResult": {
+        "type": "object",
+        "properties": {
+          "error_message": {
+            "type": "string",
+            "description": "Human-readable description of the failure."
+          },
+          "id": {
+            "type": "string",
+            "description": "Gift ID in Portals (UUID)."
+          },
+          "nft": {
+            "$ref": "#/components/schemas/model.Nft",
+            "description": "Gift data."
+          },
+          "price": {
+            "type": "string",
+            "description": "Price of the gift in GRAM from the request, decimal string."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Failure reason code; empty on success."
+          },
+          "status": {
+            "type": "string",
+            "description": "Purchase result: success or failed."
+          }
+        }
+      },
+      "nft.TransferFailedItem": {
+        "type": "object",
+        "properties": {
+          "nft_id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440001",
+            "description": "Gift ID in Portals (UUID)."
+          },
+          "reason": {
+            "type": "string",
+            "example": "NFT is locked until 2024-02-15",
+            "description": "Human-readable reason the gift was not transferred."
+          }
+        }
+      },
+      "nft.TransferGiftsIn": {
+        "type": "object",
+        "required": [
+          "nft_ids"
+        ],
+        "properties": {
+          "anonymous": {
+            "type": "boolean",
+            "example": false,
+            "description": "Ignored: transfers through the Partners API are always anonymous, the recipient does not see the sender."
+          },
+          "nft_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            },
+            "description": "IDs of gifts to transfer (UUID)."
+          },
+          "recipient": {
+            "type": "string",
+            "example": "username (use only if you do not have it) or telegram_id",
+            "description": "Recipient's Telegram ID or username, with or without @; the recipient must be a Portals user."
+          },
+          "recipient_token": {
+            "type": "string",
+            "example": "opaque token from /nfts/transfer-gifts/recipients",
+            "description": "Opaque recipient token from the Portals recipient search; used instead of recipient."
+          }
+        }
+      },
+      "nft.TransferGiftsOut": {
+        "type": "object",
+        "properties": {
+          "failed_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nft.TransferFailedItem"
+            },
+            "description": "Gifts that were not transferred, with reasons."
+          },
+          "recipient": {
+            "$ref": "#/components/schemas/nft.TransferRecipientInfo",
+            "description": "Recipient of the gifts."
+          },
+          "transferred_count": {
+            "type": "integer",
+            "example": 2,
+            "description": "Number of gifts transferred."
+          }
+        }
+      },
+      "nft.TransferRecipientInfo": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "example": 123456789,
+            "description": "Recipient's Telegram ID."
+          },
+          "username": {
+            "type": "string",
+            "example": "recipient_username",
+            "description": "Recipient's Telegram username, if set."
+          }
+        }
+      },
+      "nft.UpdatedNftDetail": {
+        "type": "object",
+        "properties": {
+          "current_price": {
+            "type": "string",
+            "description": "Current listing price in GRAM, decimal string."
+          },
+          "id": {
+            "type": "string",
+            "description": "Gift ID in Portals (UUID)."
+          },
+          "nft": {
+            "$ref": "#/components/schemas/model.Nft",
+            "description": "Gift data at the time of the check."
+          },
+          "old_price": {
+            "type": "string",
+            "description": "Price from the request in GRAM, decimal string."
+          },
+          "status": {
+            "$ref": "#/components/schemas/model.NftStatus",
+            "description": "Current gift status."
+          }
+        }
+      },
+      "nft.WithdrawGiftsIn": {
+        "type": "object",
+        "properties": {
+          "gift_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            },
+            "description": "IDs of gifts to withdraw to Telegram (UUID); the gifts must not be listed for sale."
+          },
+          "recipient_id": {
+            "type": "integer",
+            "description": "Telegram ID of the user to send the gifts to; by default they go to the user's own Telegram account."
+          },
+          "unsafe_transfer": {
+            "type": "boolean",
+            "description": "Set to false to send only if recipient_id is a registered Portals user; otherwise this check is skipped."
+          }
+        }
+      },
+      "nft.WithdrawGiftsOut": {
+        "type": "object",
+        "required": [
+          "withdrawals_ids"
+        ],
+        "properties": {
+          "withdrawals_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Withdrawal IDs, one per gift, for checking withdrawal status."
+          }
+        }
+      },
+      "nft.WithdrawalStatus": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "details": {
+            "type": "string",
+            "enum": [
+              "failed to determine withdrawal status",
+              "gift transferred successfully",
+              "gift could not be sent inside app; recipient not registered; gift returned to sender; commission returned to sender",
+              "GiftID is nil",
+              "gift could not be sent inside app; recipient registered; gift returned to recipient; commission returned to recipient",
+              "gift is not on relayer; cannot transfer; write to tech support"
+            ],
+            "description": "Human-readable details of the withdrawal result."
+          },
+          "id": {
+            "type": "integer",
+            "description": "Withdrawal ID."
+          },
+          "nft_id": {
+            "type": "string",
+            "description": "Gift ID in Portals (UUID)."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "completed",
+              "errored",
+              "recovered",
+              "unknown"
+            ],
+            "description": "Withdrawal status."
+          }
+        }
+      },
+      "nft.WithdrawalStatusesOut": {
+        "type": "object",
+        "required": [
+          "statuses"
+        ],
+        "properties": {
+          "statuses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nft.WithdrawalStatus"
+            },
+            "description": "Status of each requested withdrawal."
+          }
+        }
+      },
+      "user.CheckExistenceOut": {
+        "type": "object",
+        "properties": {
+          "exists": {
+            "type": "boolean",
+            "description": "Whether a user with this Telegram ID is registered in Portals."
+          }
+        }
+      },
+      "usersactions.FetchAllUserActionsOut": {
+        "type": "object",
+        "required": [
+          "actions"
+        ],
+        "properties": {
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/model.AnonymizedUserAction"
+            },
+            "description": "Market actions, newest first."
+          }
+        }
+      },
+      "usersactions.FetchUserActionsOut": {
+        "type": "object",
+        "required": [
+          "actions"
+        ],
+        "properties": {
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/model.DetailedUserAction"
+            },
+            "description": "Actions of the authenticated user as initiator or other party, newest first."
+          }
+        }
+      },
+      "userwallet.GenerateDepositIdOut": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Deposit ID (UUID) to put in the transfer comment when sending GRAM to the deposit wallet."
+          }
+        }
+      },
+      "userwallet.InfoOut": {
+        "type": "object",
+        "required": [
+          "balance",
+          "frozen_funds"
+        ],
+        "properties": {
+          "balance": {
+            "type": "string",
+            "description": "Available balance in GRAM as a decimal string."
+          },
+          "frozen_funds": {
+            "type": "string",
+            "description": "Amount reserved for active offers and pending operations, in GRAM as a decimal string."
+          }
+        }
+      },
+      "userwallet.WithdrawIn": {
+        "type": "object",
+        "required": [
+          "amount",
+          "external_address"
+        ],
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Amount to withdraw in GRAM as a decimal string."
+          },
+          "external_address": {
+            "type": "string",
+            "description": "TON wallet address to send the funds to."
+          }
+        }
+      },
+      "userwallet.WithdrawOut": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Withdrawal ID (UUID) for checking its status."
+          }
+        }
+      },
+      "userwallet.WithdrawStatusOut": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/dwithdrawalsrepo.FetchStatusByIdOut"
+            },
+            "description": "Statuses of the requested withdrawals."
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "collection-offers"
+    },
+    {
+      "name": "collection-filters"
+    },
+    {
+      "name": "collections"
+    },
+    {
+      "name": "collection"
+    },
+    {
+      "name": "deposit"
+    },
+    {
+      "name": "market"
+    },
+    {
+      "name": "nfts"
+    },
+    {
+      "name": "users_wallets"
+    },
+    {
+      "name": "users"
+    },
+    {
+      "name": "arena"
+    }
+  ]
+}
