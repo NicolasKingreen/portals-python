@@ -88,3 +88,23 @@ def test_package_versions_exposed() -> None:
 
     assert portals.__version__ == version("portals-api")
     assert portals.__api_version__ == "1.0.0"
+
+
+def test_market_config_accepts_live_cooldown_type() -> None:
+    """The live API returns `cooldown` as an integer although the contract says string."""
+    payload = {
+        "commission": "0.02",
+        "user_cashback": "0",
+        "deposit_wallet": "UQAE88HHexampleDaXai6gtwi",
+        "usd_course": "1.17",
+        "rub_course": "94.1",
+        "cooldown": 60000000000,
+    }
+
+    config = portals.MarketConfig.model_validate(payload)
+    assert config.cooldown == 60000000000
+    assert config.commission == Decimal("0.02")
+    assert config.deposit_wallet == payload["deposit_wallet"]
+
+    config = portals.MarketConfig.model_validate({**payload, "cooldown": "60000000000"})
+    assert config.cooldown == "60000000000"

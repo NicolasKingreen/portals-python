@@ -41,6 +41,10 @@ uv run ruff format src/portals/models.py src/portals/_contract.py
 If upstream adds a new schema in `components.schemas`, add its Python class name mapping to
 `CLASS_NAMES` in `scripts/generate_models.py`.
 
+If the live API disagrees with the contract, add a targeted entry to `FIELD_TYPE_OVERRIDES` in the
+same script instead of hand-editing `models.py`; the override survives regeneration. Every entry
+should be verifiable against `https://portal-market.com` and noted in `CHANGELOG.md`.
+
 ## Releasing
 
 1. Ensure `specs/partners.en.json` and generated models are up to date.

@@ -255,7 +255,7 @@ class OwnedNFTsResponse(PortalsResponse):
 
 class MarketConfig(PortalsResponse):
     commission: Amount = Field()
-    cooldown: str = Field()
+    cooldown: str | int = Field()
     deposit_wallet: str = Field()
     rub_course: Amount = Field()
     usd_course: Amount = Field()

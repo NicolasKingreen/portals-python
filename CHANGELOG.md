@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ResponseValidationError` messages now name the failing fields instead of only reporting that
   the payload did not match the expected model.
 
+### Fixed
+
+- `client.market.config()` no longer fails validation. The contract documents `cooldown` as a
+  string, but the live API returns an integer (nanoseconds), so `MarketConfig.cooldown` now
+  accepts both forms.
+
 ## [0.1.0] - 2026-10-31
 
 API contract: 1.0.0
