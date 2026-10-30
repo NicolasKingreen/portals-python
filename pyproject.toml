@@ -54,5 +54,4 @@ select = ["E", "F", "I", "UP", "B", "RUF"]
 ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
-# Generated enums still use `str, Enum`; switching to StrEnum is tracked separately.
-"src/portals/models.py" = ["RUF022", "UP042"]
+"src/portals/models.py" = ["RUF022"]

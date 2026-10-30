@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 
 from pydantic import Field
@@ -330,7 +330,7 @@ class CollectionPreview(PortalsModel):
     zero_commission: bool | None = Field(default=None)
 
 
-class DepositBonusClaimStatus(str, Enum):
+class DepositBonusClaimStatus(StrEnum):
     PENDING = "pending"
     CLAIMABLE = "claimable"
     PAID = "paid"
@@ -382,7 +382,7 @@ class NFTAttribute(PortalsModel):
     value: str = Field()
 
 
-class NFTAttributeType(str, Enum):
+class NFTAttributeType(StrEnum):
     MODEL = "model"
     BACKDROP = "backdrop"
     SYMBOL = "symbol"
@@ -394,12 +394,12 @@ class NFTDepositBonus(PortalsModel):
     status: DepositBonusClaimStatus | None = Field(default=None)
 
 
-class NFTImportSource(str, Enum):
+class NFTImportSource(StrEnum):
     BOT = "bot"
     USER_BOT = "user_bot"
 
 
-class NFTStatus(str, Enum):
+class NFTStatus(StrEnum):
     LISTED = "listed"
     UNLISTED = "unlisted"
     WITHDRAWN = "withdrawn"
@@ -407,7 +407,7 @@ class NFTStatus(str, Enum):
     DELETED = "deleted"
 
 
-class TONWithdrawalStatus(str, Enum):
+class TONWithdrawalStatus(StrEnum):
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     RESOLVED = "resolved"
@@ -459,7 +459,7 @@ class ActionOffer(PortalsModel):
     status: str = Field()
 
 
-class UserActionType(str, Enum):
+class UserActionType(StrEnum):
     PURCHASE = "purchase"
     OFFER = "offer"
     COLLECTION_OFFER = "collection_offer"
@@ -520,7 +520,7 @@ class InvalidNFT(PortalsModel):
     reason: InvalidNFTReason | None = Field(default=None)
 
 
-class InvalidNFTReason(str, Enum):
+class InvalidNFTReason(StrEnum):
     NFT_NOT_FOUND = "NFT_NOT_FOUND"
     NFT_NOT_LISTED = "NFT_NOT_LISTED"
     OWNER_CHANGED = "OWNER_CHANGED"

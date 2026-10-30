@@ -153,7 +153,7 @@ class Generator:
         return "Any"
 
     def render_enum(self, class_name: str, schema: dict[str, Any]) -> None:
-        lines = [f"class {class_name}(str, Enum):"]
+        lines = [f"class {class_name}(StrEnum):"]
         used: set[str] = set()
         for value in schema["enum"]:
             member = re.sub(r"[^A-Za-z0-9]+", "_", str(value)).strip("_").upper()
@@ -230,7 +230,7 @@ class Generator:
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 
 from pydantic import Field
