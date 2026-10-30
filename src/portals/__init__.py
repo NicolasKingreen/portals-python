@@ -1,4 +1,5 @@
 from . import models as _models
+from ._contract import __api_version__
 from ._models import Amount, RateLimit
 from .client import AsyncPortalsClient, PortalsClient
 from .exceptions import (
@@ -32,6 +33,7 @@ __all__ = [
     "RateLimitError",
     "ResponseValidationError",
     "TransportError",
+    "__api_version__",
     "__version__",
     *_models.__all__,
 ]

@@ -32,6 +32,14 @@ Amount = Annotated[
 
 
 class PortalsModel(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class PortalsRequest(PortalsModel):
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class PortalsResponse(PortalsModel):
     model_config = ConfigDict(extra="allow", populate_by_name=True)
 
 
